@@ -11,11 +11,17 @@ Written by:
  
 Files:
     burntrees.pl   -- the Perl script
+
     burntrees.txt  -- documentation in text format
+
     burntrees.html -- documentation in html format
+
     catmb.pl       -- Perl script for concatenating files using burntrees.pl
+
     catmb.txt      -- documentation in text format
+
     catmb.html     -- documentation in html format
+
     dat.t, dat.p   -- test data
 
 Get started with burntrees.pl:
