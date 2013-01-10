@@ -1,0 +1,245 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>burntrees.pl</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#version">VERSION</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#usage">USAGE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#reporting_bugs">REPORTING BUGS</a></li>
+	<li><a href="#dependencies">DEPENDENCIES</a></li>
+	<li><a href="#license_and_copyright">LICENSE AND COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>burntrees.pl</p>
+<p>
+</p>
+<hr />
+<h1><a name="version">VERSION</a></h1>
+<p>Documentation for burntrees.pl version 0.1.9</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>burntrees.pl [--burnin=&lt;number&gt;] [--pburnin=&lt;number&gt;] [--start=&lt;number&gt;] [--end=&lt;number&gt;] [--jump=&lt;number&gt;] [--IFeelLucky=&lt;number&gt;] [--treesonly] [--rmbrlens] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=&lt;file_name&gt;] FILE [&gt; OUTPUT]</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Script for manipulating tree (*.t, *.trprobs, *.con, *.trees) and parameter (*.p, *.log) files
+from MrBayes (v.3) or BEAST.
+The script exctracts trees and (by default) the taxon translation table and the trailing ``end;''
+from tree file.</p>
+<p>A number of options are available:</p>
+<p>Any contiguous interval of trees can be printed, as well as trees only (nothing other than tree descriptions).</p>
+<p>The samples can be thinned by setting a value for how many trees to jump before next is printed.</p>
+<p>Branch lengths (if present) can be removed from trees before printing.</p>
+<p>A random set of trees can be printed from the tree file.</p>
+<p>Lines can also be extracted from a MrBayes *.p file.</p>
+<p>Trees can be printed in Phylip (Newick) format or as altnexus (sequence labels instead of numbers),
+that is, the script can serve as an efficient tree format converter.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<p>Mandatory arguments to long options are mandatory for short options too</p>
+<dl>
+<dt><strong><a name="item__2db_2c__2d_2dburnin_3dnumber"><strong>-b, --burnin=</strong><em>number</em></a></strong></dt>
+
+<dd>
+<p>Start printing after tree <em>number</em>.</p>
+</dd>
+<dt><strong><a name="item__2dc_2c__2d_2dclose"><strong>-c, --close</strong></a></strong></dt>
+
+<dd>
+<p>Forces a trailing ``end;'' to be printed after the last tree.
+<strong>--noclose</strong> prevents the ``end;'' to be printed.
+Note that the trailing ``end;'' in the tree file is printed
+by default unless <strong>--noclose</strong> is given.</p>
+</dd>
+<dt><strong><a name="item__2dco_2c__2d_2dconcatenate"><strong>-co, --concatenate</strong></a></strong></dt>
+
+<dd>
+<p>Concatenate several files -- <em>Not yet implemented</em>. See <strong>USAGE</strong> for alternatives.</p>
+</dd>
+<dt><strong><a name="item__2de_2c__2d_2dend_3dnumber"><strong>-e, --end=</strong><em>number</em></a></strong></dt>
+
+<dd>
+<p>End the printing of trees after tree <em>number</em> (inclusively).
+If no <strong>--end</strong> is given, prints to last tree in file.</p>
+</dd>
+<dt><strong><a name="item__2df_2c__2d_2dformat_3dformat"><strong>-f, --format=</strong><em>format</em></a></strong></dt>
+
+<dd>
+<p>Trees are printed as specified by <em>format</em>, where <em>format</em> is either <em>altnexus</em>: with sequence (taxon) labels instead of numbers, or <em>phylip</em> (the Newick format).</p>
+</dd>
+<dt><strong><a name="item__2dg_2c__2d_2dgetinfo"><strong>-g, --getinfo</strong></a></strong></dt>
+
+<dd>
+<p>Print information about the number of trees (or samples in p file), thinning and number of samples in file and quit.</p>
+</dd>
+<dt><strong><a name="item__2dh_2c__2d_2dhelp"><strong>-h, --help</strong></a></strong></dt>
+
+<dd>
+<p>Prints help message and exits.</p>
+</dd>
+<dt><strong><a name="item__2di_2c__2d_2difeellucky_3dnumber"><strong>-i, --IFeelLucky=</strong><em>number</em></a></strong></dt>
+
+<dd>
+<p>Specify a probability (value between 0 -- 1) for each tree to be printed. That is, print each tree with prob. <em>number</em>.
+Note that <strong>--IFeelLucky</strong> has precedence over <strong>--jump</strong>.</p>
+</dd>
+<dt><strong><a name="item__2dj_2c__2d_2djump_3dnumber"><strong>-j, --jump=</strong><em>number</em></a></strong></dt>
+
+<dd>
+<p>Specify a thinning. That is, print every <em>number</em> tree.</p>
+</dd>
+<dt><strong><a name="item__2dl_2c__2d_2dlabels"><strong>-l, --labels</strong></a></strong></dt>
+
+<dd>
+<p>Print trees using sequence (taxon) labels instead of the sequence numbers in the translation table.
+<strong>--nolabels</strong> (which is the default) prevents the sequence numbers to be substituted.</p>
+</dd>
+<dt><strong><a name="item__2dm_2c__2d_2dman"><strong>-m, --man</strong></a></strong></dt>
+
+<dd>
+<p>Displays the manual page.</p>
+</dd>
+<dt><strong><a name="item__2do_2c__2d_2doutfile_3dfile_name"><strong>-o, --outfile=</strong><em>file_name</em></a></strong></dt>
+
+<dd>
+<p>Print directly to file <em>file_name</em> instead of standard out.</p>
+</dd>
+<dt><strong><a name="item__2dp_2c__2d_2dpburnin_3dnumber"><strong>-p, --pburnin=</strong><em>number</em></a></strong></dt>
+
+<dd>
+<p>Start printing after a fraction of the run, where <em>number</em> is a percentage (e.g. ``50'' for half the run).</p>
+</dd>
+<dt><strong><a name="item__2dr_2c__2d_2drmbrlens"><strong>-r, --rmbrlens</strong></a></strong></dt>
+
+<dd>
+<p>Remove branch lengths from trees.</p>
+</dd>
+<dt><strong><a name="item__2ds_2c__2d_2dstart_3dnumber"><strong>-s, --start=</strong><em>number</em></a></strong></dt>
+
+<dd>
+<p>Start printing from tree <em>number</em> (inclusively).</p>
+</dd>
+<dt><strong><a name="item__2dt_2c__2d_2dtreesonly"><strong>-t, --treesonly</strong></a></strong></dt>
+
+<dd>
+<p>Print trees only (do not print taxon descriptions etc.).
+If used on a *.p file it skips the ``ID'' line and the headers.</p>
+</dd>
+<dt><strong><a name="item__2dv_2c__2d_2dversion"><strong>-v, --version</strong></a></strong></dt>
+
+<dd>
+<p>Prints version message and exits.</p>
+</dd>
+<dt><strong><a name="item_file"><strong>FILE</strong></a></strong></dt>
+
+<dd>
+<p>Reads a Nexus formatted tree <strong>FILE</strong>, preferrably MrBayes (v.3) *.t,
+*.con, and *.trprobs files. <strong>FILE</strong> can also be a MrBayes parameter
+file (*.p), or any Nexus formatted tree file (this last feature is
+not thoroughly tested!).</p>
+</dd>
+<dt><strong><a name="item_output"><strong>OUTPUT</strong></a></strong></dt>
+
+<dd>
+<p>Prints to <strong>STDOUT</strong> unless <strong>--outfile=</strong> is used.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="usage">USAGE</a></h1>
+<p>Examples:</p>
+<pre>
+  burntrees.pl --burnin=10 data.t &gt; out.t
+  burntrees.pl --pburnin=50 data.t
+  burntrees.pl --start=11 --end=30 data.t
+  burntrees.pl --jump=10 data.t
+  burntrees.pl --treesonly data.t
+  burntrees.pl --getinfo -b=10 data.t
+  burntrees.pl --rmbrlens data.t
+  burntrees.pl --ifeellucky=0.50 data.t
+  burntrees.pl -b=10 -j=10 -t -r data.t
+  burntrees.pl --treesonly -b=10 data.p
+  burntrees.pl --format=altnexus data.t
+  burntrees.pl -f=phylip --outfile=data.phy data.t
+  burntrees.pl -f=p -b=1 data.con</pre>
+<p>For concatenation of several files, use (note the append redirection, ``&gt;&gt;''):</p>
+<pre>
+  burntrees.pl -b=10 -noc  data.run1.t &gt;  data.t
+  burntrees.pl -b=40 -t    data.run2.t &gt;&gt; data.t
+  burntrees.pl -b=20 -t -c data.run3.t &gt;&gt; data.t</pre>
+<p>To print the '#NEXUS', 'begin trees;', and the translation table only (no trees), use</p>
+<pre>
+  burntrees.pl -i=0 -noc data.t</pre>
+<p>To convert the MrBayes file to a 'altnexus' file or a 'phylip' file, use</p>
+<pre>
+  burntrees.pl --format=altnexus data.t
+  burntrees.pl --format=phylip data.t</pre>
+<p>To concatenate several files in to one altnexus formatted file, use (note the combination of '--format' and '--labels')</p>
+<pre>
+  burntrees.pl -b=10 -noc  -f=a data.run1.t &gt;  data.t
+  burntrees.pl -b=40 -t    -l   data.run2.t &gt;&gt; data.t
+  burntrees.pl -b=20 -t -c -l   data.run3.t &gt;&gt; data.t</pre>
+<p>To extract the second tree in the MrBayes *.con file in phylip format, use</p>
+<pre>
+  burntrees.pl -b=1 -f=p data.con</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Written by Johan A. A. Nylander</p>
+<p>
+</p>
+<hr />
+<h1><a name="reporting_bugs">REPORTING BUGS</a></h1>
+<p>Please report any bugs to <em>jnylander @ users.sourceforge.net</em>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="dependencies">DEPENDENCIES</a></h1>
+<p>Uses Perl modules Getopt::Long and Pod::Usage</p>
+<p>
+</p>
+<hr />
+<h1><a name="license_and_copyright">LICENSE AND COPYRIGHT</a></h1>
+<p>Copyright (c) 2006, 2007, 2008, 2009, 2010, 2011 Johan Nylander.
+All rights reserved.</p>
+<p>This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details. 
+<a href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a></p>
+
+</body>
+
+</html>
