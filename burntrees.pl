@@ -452,9 +452,14 @@ exit(0);
 #===============================================================================
 sub strip_brlens_print {
 
-    ($_) = @_;
-
-    $_ =~ s/:[\d\.]+//g; # Search for any pattern such as ":0.033372" and replace with nothing
+    ($_) = @_; 
+    
+    if (/e-0\d+/) { # if scientific notation ":1.309506485347851e-01"
+        $_ =~ s/:[\d\.e\-]+//g;
+    }
+    else {
+        $_ =~ s/:[\d\.]+//g; # Search for any pattern such as ":0.033372" and replace with nothing
+    }
 
     print $PRINT_FH $_;
 
