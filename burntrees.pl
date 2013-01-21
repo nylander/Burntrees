@@ -14,7 +14,7 @@ use Pod::Usage;
 ## Globals
 my $scriptname         = $0;
 my $VERSION            = '0.1.9';
-my $CHANGES            = '04/08/2011 03:19:36 PM CEST';
+my $CHANGES            = '01/21/2013 05:41:54 PM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
@@ -570,7 +570,7 @@ sub remove_tree_name {
 
 #===  FUNCTION  ================================================================
 #         NAME:  read_labels
-#      VERSION:  04/08/2011 03:21:51 PM CEST
+#      VERSION:  01/21/2013 05:30:23 PM
 #  DESCRIPTION:  reads sequence (taxon) labels and associates them with numbers
 #   PARAMETERS:  file name
 #      RETURNS:  Hash with taxon translation table
@@ -588,11 +588,11 @@ sub read_labels {
         if($line =~ m/\s*tree\s+state/i) {
             last;
         }
-        elsif($line =~ m/^\s+(\d+)\s+([\w|\s|'|\d|,|;]+)\Z/) { # capture the number, and the
-            my $number = $1;                                 # taxon name allowing for single-
-            my $name = $2;                                   # quoted taxon names
-            $name =~ s/,\Z//;
-            $name =~ s/;\Z//;
+        elsif($line =~ m/^\s*(\d+)\s+([\w|\s|\W]+)$/) { # capture the number, and the
+            my $number = $1;                            # taxon name allowing for single-
+            my $name = $2;                              # quoted taxon names
+            $name =~ s/\s*,\s*$//;
+            $name =~ s/\s*;\s*$//;
             $hash{$number} = $name;
         }
     }
