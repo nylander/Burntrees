@@ -1,7 +1,5 @@
 Check new tree formats (scientific etc) in BEAST and MrBayes 3.2!
 
-Can't handle taxon names within single quotes due to the regexpr '\b', "word boundry"?! Should be changed to "\b | '" or similar.
-
 Warn if jump == 0
 
 Warn if jump > trees in file(+/- 1?)
