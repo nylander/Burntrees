@@ -3,27 +3,17 @@
 ## Use 'perldoc burntrees.pl' or see the end of file for description.
 
 
-## TODO:
-##    * --concatenate?
-##    * Handle rooting info ('[&R]')? That is, keep if present in altnex format?
-##    * Test BEAST: BEAST_174.trees, BEAST_174.log
-##        ./burntrees.pl -st=10 -e=20  -f=a BEAST_174.trees
-##        extra "END;" just before the the end when -f=a
-##
-##    * Test pb33f.trace, pb33f.treelist
-
-
 use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
-use Data::Dumper;
+#use Data::Dumper;
 
 
 ## Globals
 my $scriptname         = $0;
 my $VERSION            = '0.2.0';
-my $CHANGES            = '02/13/2013 09:23:14 AM';
+my $CHANGES            = '02/13/2013 10:23:38 AM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
