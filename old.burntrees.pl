@@ -2,9 +2,6 @@
 
 ## Use 'perldoc burntrees.pl' or see the end of file for description.
 
-## TODO: Concatenate and multiple burnins
-
-
 use strict;
 use warnings;
 use Getopt::Long;
@@ -18,7 +15,6 @@ my $CHANGES            = '01/21/2013 05:41:54 PM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
-#my $concatenate       = q{};
 my $end                = q{};
 my $format             = q{};
 my $getinfo            = q{};
