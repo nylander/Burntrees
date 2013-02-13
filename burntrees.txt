@@ -2,19 +2,20 @@ NAME
     burntrees.pl
 
 VERSION
-    Documentation for burntrees.pl version 0.1.9
+    Documentation for burntrees.pl version 0.2.0
 
 SYNOPSIS
     burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>]
     [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly]
-    [--rmbrlens] [--[no]close] [--getinfo] [--[no]labels]
+    [--rmbrlens] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels]
     [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
 DESCRIPTION
     Script for manipulating tree (*.t, *.trprobs, *.con, *.trees) and
-    parameter (*.p, *.log) files from MrBayes (v.3) or BEAST. The script
-    exctracts trees and (by default) the taxon translation table and the
-    trailing "end;" from tree file.
+    parameter (*.p, *.log) files from MrBayes (v.3) or BEAST.
+
+    The script extracts trees and (by default) the taxon translation table
+    and the trailing "end;" from tree file.
 
     A number of options are available:
 
@@ -25,6 +26,9 @@ DESCRIPTION
     before next is printed.
 
     Branch lengths (if present) can be removed from trees before printing.
+
+    Branch lengths in scientific numeric format can be transformed to a
+    fixed numeric format.
 
     A random set of trees can be printed from the tree file.
 
@@ -76,8 +80,8 @@ OPTIONS
 
     -l, --labels
             Print trees using sequence (taxon) labels instead of the
-            sequence numbers in the translation table. --nolabels (which is
-            the default) prevents the sequence numbers to be substituted.
+            sequence numbers from the translation table. --nolabels (which
+            is the default) prevents the sequence numbers to be substituted.
 
     -m, --man
             Displays the manual page.
@@ -92,7 +96,10 @@ OPTIONS
     -r, --rmbrlens
             Remove branch lengths from trees.
 
-    -s, --start=*number*
+    -sc, --sci2norm
+            Translate branch lengths from scientific to normal or fixed.
+
+    -st, --start=*number*
             Start printing from tree *number* (inclusively).
 
     -t, --treesonly
@@ -104,8 +111,9 @@ OPTIONS
 
     FILE    Reads a Nexus formatted tree FILE, preferrably MrBayes (v.3)
             *.t, *.con, and *.trprobs files. FILE can also be a MrBayes
-            parameter file (*.p), or any Nexus formatted tree file (this
-            last feature is not thoroughly tested!).
+            parameter file (*.p), or any Nexus formatted tree file, e.g.,
+            output from BEAST or other phylogenetic MCMC software (not
+            thoroughly tested!).
 
     OUTPUT  Prints to STDOUT unless --outfile= is used.
 
@@ -127,7 +135,7 @@ USAGE
       burntrees.pl -f=p -b=1 data.con
 
     For concatenation of several files, use (note the append redirection,
-    ">>"):
+    ">>". See also separate script catmb.pl):
 
       burntrees.pl -b=10 -noc  data.run1.t >  data.t
       burntrees.pl -b=40 -t    data.run2.t >> data.t
@@ -155,18 +163,24 @@ USAGE
 
       burntrees.pl -b=1 -f=p data.con
 
+    To change the branch length format from scientific to numerical use
+
+      burntrees.pl --sci2norm data.con.tre
+
 AUTHOR
     Written by Johan A. A. Nylander
 
 REPORTING BUGS
-    Please report any bugs to *jnylander @ users.sourceforge.net*.
+    Please report any bugs to *Johan.Nylander @ bils.se*.
 
 DEPENDENCIES
     Uses Perl modules Getopt::Long and Pod::Usage
 
+DOWNLOAD
+    https://github.com/nylander/Burntrees
+
 LICENSE AND COPYRIGHT
-    Copyright (c) 2006, 2007, 2008, 2009, 2010, 2011 Johan Nylander. All rights
-    reserved.
+    Copyright (c) 2006--2013, Johan Nylander. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
