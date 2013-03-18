@@ -7,13 +7,13 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
-#use Data::Dumper;
+use Data::Dumper;
 
 
 ## Globals
 my $scriptname         = $0;
 my $VERSION            = '0.2.0';
-my $CHANGES            = '03/18/2013 10:07:35 AM';
+my $CHANGES            = '03/18/2013 11:28:09 AM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
@@ -40,6 +40,7 @@ my $outfile            = q{};
 my $pburnin            = q{};
 my $random_nr          = q{};
 my $rmbrlens           = q{};
+my $rmcomments         = q{};
 my $sci2norm           = q{};
 my $start              = q{};
 my $treesonly          = q{};
@@ -74,6 +75,7 @@ MAIN:
                    'outfile:s'    => \$outfile,
                    'pburnin:i'    => \$pburnin,
                    'rmbrlens'     => \$rmbrlens,
+                   'rmcomments'   => \$rmcomments,
                    'start:i'      => \$start,
                    'sci2norm'     => \$sci2norm,
                    'treesonly'    => \$treesonly,
@@ -293,6 +295,9 @@ MAIN:
             #if ($rmbrlens) { # Should rmbrlens here once. No strip_brlens_print needed?
             #    #$_ = ;
             #}
+            if ($rmcomments) {
+                $_ = remove_figtree_comments($_);
+            }
             if ($format) {  # Print tree in correct format
                 if ($figtree) {
                     $_ = remove_figtree_comments($_);
@@ -747,7 +752,7 @@ sub test_figtree_format {
 
 
 #===  POD DOCUMENTATION  =======================================================
-#      VERSION:  02/13/2013 10:17:54 AM
+#      VERSION:  03/18/2013 11:35:47 AM
 #  DESCRIPTION:  Documentation
 #         TODO:  ?
 #===============================================================================
@@ -766,7 +771,7 @@ Documentation for burntrees.pl version 0.2.0
 
 =head1 SYNOPSIS
 
-burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
+burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
 
 =head1 DESCRIPTION
@@ -783,7 +788,7 @@ Any contiguous interval of trees can be printed, as well as trees only (nothing 
 
 The samples can be thinned by setting a value for how many trees to jump before next is printed.
 
-Branch lengths (if present) can be removed from trees before printing.
+Branch lengths and/or comments (if present) can be removed from trees before printing.
 
 Branch lengths in scientific numeric format can be transformed to a fixed numeric format.
 
@@ -874,9 +879,14 @@ Print directly to file I<file_name> instead of standard out.
 Start printing after a fraction of the run, where I<number> is a percentage (e.g. "50" for half the run).
 
 
-=item B<-r, --rmbrlens>
+=item B<-rmb, --rmbrlens>
 
 Remove branch lengths from trees.
+
+
+=item B<-rmc, --rmcomments>
+
+Remove comments (text within, and the enclosing square brackets) from trees.
 
 
 =item B<-sc, --sci2norm>
@@ -927,6 +937,7 @@ Examples:
   burntrees.pl --treesonly data.t
   burntrees.pl --getinfo -b=10 data.t
   burntrees.pl --rmbrlens data.t
+  burntrees.pl --rmcomments data.t
   burntrees.pl --ifeellucky=0.50 data.t
   burntrees.pl -b=10 -j=10 -t -r data.t
   burntrees.pl --treesonly -b=10 data.p
