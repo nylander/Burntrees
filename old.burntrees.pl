@@ -2,6 +2,9 @@
 
 ## Use 'perldoc burntrees.pl' or see the end of file for description.
 
+## TODO: Concatenate and multiple burnins
+
+
 use strict;
 use warnings;
 use Getopt::Long;
@@ -11,10 +14,11 @@ use Pod::Usage;
 ## Globals
 my $scriptname         = $0;
 my $VERSION            = '0.1.9';
-my $CHANGES            = '01/21/2013 05:41:54 PM';
+my $CHANGES            = '04/08/2011 03:19:36 PM CEST';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
+#my $concatenate       = q{};
 my $end                = q{};
 my $format             = q{};
 my $getinfo            = q{};
@@ -448,14 +452,9 @@ exit(0);
 #===============================================================================
 sub strip_brlens_print {
 
-    ($_) = @_; 
-    
-    if (/e-0\d+/) { # if scientific notation ":1.309506485347851e-01"
-        $_ =~ s/:[\d\.e\-]+//g;
-    }
-    else {
-        $_ =~ s/:[\d\.]+//g; # Search for any pattern such as ":0.033372" and replace with nothing
-    }
+    ($_) = @_;
+
+    $_ =~ s/:[\d\.]+//g; # Search for any pattern such as ":0.033372" and replace with nothing
 
     print $PRINT_FH $_;
 
@@ -571,7 +570,7 @@ sub remove_tree_name {
 
 #===  FUNCTION  ================================================================
 #         NAME:  read_labels
-#      VERSION:  01/21/2013 05:30:23 PM
+#      VERSION:  04/08/2011 03:21:51 PM CEST
 #  DESCRIPTION:  reads sequence (taxon) labels and associates them with numbers
 #   PARAMETERS:  file name
 #      RETURNS:  Hash with taxon translation table
@@ -589,11 +588,11 @@ sub read_labels {
         if($line =~ m/\s*tree\s+state/i) {
             last;
         }
-        elsif($line =~ m/^\s*(\d+)\s+([\w|\s|\W]+)$/) { # capture the number, and the
-            my $number = $1;                            # taxon name allowing for single-
-            my $name = $2;                              # quoted taxon names
-            $name =~ s/\s*,\s*$//;
-            $name =~ s/\s*;\s*$//;
+        elsif($line =~ m/^\s+(\d+)\s+([\w|\s|'|\d|,|;]+)\Z/) { # capture the number, and the
+            my $number = $1;                                 # taxon name allowing for single-
+            my $name = $2;                                   # quoted taxon names
+            $name =~ s/,\Z//;
+            $name =~ s/;\Z//;
             $hash{$number} = $name;
         }
     }
