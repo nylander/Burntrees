@@ -13,7 +13,7 @@ use Pod::Usage;
 ## Globals
 my $scriptname         = $0;
 my $VERSION            = '0.2.0';
-my $CHANGES            = '02/13/2013 10:23:38 AM';
+my $CHANGES            = '03/18/2013 10:07:35 AM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
@@ -118,9 +118,9 @@ MAIN:
         if (/$match/i) {
             $ntrees++;                         # Count trees in .t files or lines in .p files
             $nexttolastgen = $lastgen;
-            if ($is_tree_file) {                          # Collect info on generation number in t file
-                $_ =~ /\s+(STATE_|rep\.|gen\.)(\d+)\s+/i; # BEAST 1.7.4 | MrBayes old | MrBayes 3.2
-                if ($2) {                                 # If 'rep' is not found in tree file, then
+            if ($is_tree_file) {                               # Collect info on generation number in t file
+                $_ =~ /\s+(STATE_|rep\.|gen\.)(\d+)[\s+|\[]/i; # BEAST 1.7.4 | MrBayes old | MrBayes 3.2
+                if ($2) {                                      # If 'rep' is not found in tree file, then
                     $lastgen = $2;
                 }
                 else {
