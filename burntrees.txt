@@ -1,4 +1,3 @@
-
 NAME
     burntrees.pl
 
@@ -8,8 +7,9 @@ VERSION
 SYNOPSIS
     burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>]
     [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly]
-    [--rmbrlens] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels]
-    [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
+    [--rmbrlens] [--rmcomments] [--sci2norm] [--[no]close] [--getinfo]
+    [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE
+    [> OUTPUT]
 
 DESCRIPTION
     Script for manipulating tree (*.t, *.trprobs, *.con, *.trees) and
@@ -26,7 +26,8 @@ DESCRIPTION
     The samples can be thinned by setting a value for how many trees to jump
     before next is printed.
 
-    Branch lengths (if present) can be removed from trees before printing.
+    Branch lengths and/or comments (if present) can be removed from trees
+    before printing.
 
     Branch lengths in scientific numeric format can be transformed to a
     fixed numeric format.
@@ -94,8 +95,12 @@ OPTIONS
             Start printing after a fraction of the run, where *number* is a
             percentage (e.g. "50" for half the run).
 
-    -r, --rmbrlens
+    -rmb, --rmbrlens
             Remove branch lengths from trees.
+
+    -rmc, --rmcomments
+            Remove comments (text within, and the enclosing square brackets)
+            from trees.
 
     -sc, --sci2norm
             Translate branch lengths from scientific to normal or fixed.
@@ -128,6 +133,7 @@ USAGE
       burntrees.pl --treesonly data.t
       burntrees.pl --getinfo -b=10 data.t
       burntrees.pl --rmbrlens data.t
+      burntrees.pl --rmcomments data.t
       burntrees.pl --ifeellucky=0.50 data.t
       burntrees.pl -b=10 -j=10 -t -r data.t
       burntrees.pl --treesonly -b=10 data.p

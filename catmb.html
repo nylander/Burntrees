@@ -2,15 +2,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>catmb.pl</title>
+<title>CatMB</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body style="background-color: white">
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -23,11 +25,14 @@
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#reporting_bugs">REPORTING BUGS</a></li>
 	<li><a href="#dependencies">DEPENDENCIES</a></li>
+	<li><a href="#download">DOWNLOAD</a></li>
 	<li><a href="#license_and_copyright">LICENSE AND COPYRIGHT</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -57,55 +62,47 @@ needs to be installed for catmb.pl to work.</p>
 <h1><a name="options">OPTIONS</a></h1>
 <p>Mandatory arguments to long options are mandatory for short options too</p>
 <dl>
-<dt><strong><a name="item__2db_2c__2d_2dburnin_3dnumber"><strong>-b, --burnin=</strong><em>number</em></a></strong>
+<dt><strong><a name="b_burnin_number" class="item"><strong>-b, --burnin=</strong><em>number</em></a></strong></dt>
 
 <dd>
 <p>Start printing after tree <em>number</em>.</p>
 </dd>
-</li>
-<dt><strong><a name="item__2dp_2c__2d_2dpburnin_3dnumber"><strong>-p, --pburnin=</strong><em>number</em></a></strong>
+<dt><strong><a name="p_pburnin_number" class="item"><strong>-p, --pburnin=</strong><em>number</em></a></strong></dt>
 
 <dd>
-<p>Start printing after a fraction of the run, where <em>number</em> is a percentage (e.g. ``50'' for half the run).</p>
+<p>Start printing after a fraction of the run, where <em>number</em> is a percentage (e.g. &quot;50&quot; for half the run).</p>
 </dd>
-</li>
-<dt><strong><a name="item__2dj_2c__2d_2djump_3dnumber"><strong>-j, --jump=</strong><em>number</em></a></strong>
+<dt><strong><a name="j_jump_number" class="item"><strong>-j, --jump=</strong><em>number</em></a></strong></dt>
 
 <dd>
 <p>Specify a thinning. That is, print every <em>number</em> tree.</p>
 </dd>
-</li>
-<dt><strong><a name="item_file"><strong>FILE</strong></a></strong>
+<dt><strong><a name="file" class="item"><strong>FILE</strong></a></strong></dt>
 
 <dd>
 <p>Reads Nexus formatted tree <strong>FILEs</strong>, preferrably a MrBayes (v.3) *.t file.
 Can also read and print a MrBayes parameter file (*.p file).</p>
 </dd>
-</li>
-<dt><strong><a name="item_output"><strong>OUTPUT</strong></a></strong>
+<dt><strong><a name="output" class="item"><strong>OUTPUT</strong></a></strong></dt>
 
 <dd>
 <p>Prints to <strong>STDOUT</strong>.</p>
 </dd>
-</li>
-<dt><strong><a name="item__2dh_2c__2d_2dhelp"><strong>-h, --help</strong></a></strong>
+<dt><strong><a name="h_help" class="item"><strong>-h, --help</strong></a></strong></dt>
 
 <dd>
 <p>Prints help message and exits</p>
 </dd>
-</li>
-<dt><strong><a name="item__2dv_2c__2d_2dversion"><strong>-v, --version</strong></a></strong>
+<dt><strong><a name="v_version" class="item"><strong>-v, --version</strong></a></strong></dt>
 
 <dd>
 <p>Prints version message and exits</p>
 </dd>
-</li>
-<dt><strong><a name="item__2dm_2c__2d_2dman"><strong>-m, --man</strong></a></strong>
+<dt><strong><a name="m_man" class="item"><strong>-m, --man</strong></a></strong></dt>
 
 <dd>
 <p>Displays the manual page</p>
 </dd>
-</li>
 </dl>
 <p>
 </p>
@@ -132,6 +129,11 @@ Can also read and print a MrBayes parameter file (*.p file).</p>
 <h1><a name="dependencies">DEPENDENCIES</a></h1>
 <p>Needs burntrees.pl to run. 
 Uses Perl modules Getopt::Long and Pod::Usage</p>
+<p>
+</p>
+<hr />
+<h1><a name="download">DOWNLOAD</a></h1>
+<p><a href="https://github.com/nylander/Burntrees">https://github.com/nylander/Burntrees</a></p>
 <p>
 </p>
 <hr />

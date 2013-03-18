@@ -2,9 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>burntrees.pl</title>
+<title>Burntrees</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body style="background-color: white">
@@ -46,7 +46,7 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>burntrees.pl [--burnin=&lt;number&gt;] [--pburnin=&lt;number&gt;] [--start=&lt;number&gt;] [--end=&lt;number&gt;] [--jump=&lt;number&gt;] [--IFeelLucky=&lt;number&gt;] [--treesonly] [--rmbrlens] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=&lt;file_name&gt;] FILE [&gt; OUTPUT]</p>
+<p>burntrees.pl [--burnin=&lt;number&gt;] [--pburnin=&lt;number&gt;] [--start=&lt;number&gt;] [--end=&lt;number&gt;] [--jump=&lt;number&gt;] [--IFeelLucky=&lt;number&gt;] [--treesonly] [--rmbrlens] [--rmcomments] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=&lt;file_name&gt;] FILE [&gt; OUTPUT]</p>
 <p>
 </p>
 <hr />
@@ -58,7 +58,7 @@ from tree file.</p>
 <p>A number of options are available:</p>
 <p>Any contiguous interval of trees can be printed, as well as trees only (nothing other than tree descriptions).</p>
 <p>The samples can be thinned by setting a value for how many trees to jump before next is printed.</p>
-<p>Branch lengths (if present) can be removed from trees before printing.</p>
+<p>Branch lengths and/or comments (if present) can be removed from trees before printing.</p>
 <p>Branch lengths in scientific numeric format can be transformed to a fixed numeric format.</p>
 <p>A random set of trees can be printed from the tree file.</p>
 <p>Lines can also be extracted from a MrBayes *.p file.</p>
@@ -141,10 +141,15 @@ Note that <strong>--IFeelLucky</strong> has precedence over <strong>--jump</stro
 <dd>
 <p>Start printing after a fraction of the run, where <em>number</em> is a percentage (e.g. &quot;50&quot; for half the run).</p>
 </dd>
-<dt><strong><a name="r_rmbrlens" class="item"><strong>-r, --rmbrlens</strong></a></strong></dt>
+<dt><strong><a name="rmb_rmbrlens" class="item"><strong>-rmb, --rmbrlens</strong></a></strong></dt>
 
 <dd>
 <p>Remove branch lengths from trees.</p>
+</dd>
+<dt><strong><a name="rmc_rmcomments" class="item"><strong>-rmc, --rmcomments</strong></a></strong></dt>
+
+<dd>
+<p>Remove comments (text within, and the enclosing square brackets) from trees.</p>
 </dd>
 <dt><strong><a name="sc_sci2norm" class="item"><strong>-sc, --sci2norm</strong></a></strong></dt>
 
@@ -194,6 +199,7 @@ BEAST or other phylogenetic MCMC software (not thoroughly tested!).</p>
   burntrees.pl --treesonly data.t
   burntrees.pl --getinfo -b=10 data.t
   burntrees.pl --rmbrlens data.t
+  burntrees.pl --rmcomments data.t
   burntrees.pl --ifeellucky=0.50 data.t
   burntrees.pl -b=10 -j=10 -t -r data.t
   burntrees.pl --treesonly -b=10 data.p
