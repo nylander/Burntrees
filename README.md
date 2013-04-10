@@ -42,6 +42,8 @@ CatMB
 catmb.pl:
 ---------
 
+Perl script for concatenating several MCMC runs.
+
 In order for catmb.pl to work, burntrees.pl must be installed in the $PATH.
 Alternatively, the full path to burntrees.pl can be specified by editing catmb.pl.
 (Then chmod +x catmb.pl) and
