@@ -12,8 +12,8 @@ use Data::Dumper;
 
 ## Globals
 my $scriptname         = $0;
-my $VERSION            = '0.2.0';
-my $CHANGES            = '03/18/2013 11:28:09 AM';
+my $VERSION            = '0.2.1';
+my $CHANGES            = '04/09/2013 09:38:26 AM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
@@ -32,6 +32,7 @@ my $jump               = q{};
 my $labels             = q{};
 my $lastgen            = q{};
 my $match              = q{};
+my $myr                = q{};
 my $nexttolastgen      = q{};
 my $noclose            = q{};
 my $nolabels           = q{};
@@ -70,6 +71,7 @@ MAIN:
                    'ifeellucky:f' => \$ifeellucky,
                    'jump:i'       => \$jump,
                    'labels'       => \$labels,
+                   'myr'          => \$myr,
                    'noclose'      => \$noclose,
                    'nolabels'     => \$nolabels,
                    'outfile:s'    => \$outfile,
@@ -170,11 +172,20 @@ MAIN:
     BRLENS:
     ## Test brlens if rmbrlens or sci2norm
     if ($rmbrlens or $sci2norm) {
-        my $has_brlens = test_brlens_presence($infile);
+        my $has_brlens = test_has_brlens($infile);
         if ( $has_brlens == 0 ) {
             die "\nWarning! the file doesn't seem to have branch lengths.\n\n";
         }
     }
+
+    ## Test clockrate if myr
+    if ($myr) {
+        my $has_clockrate = test_has_clockrate($infile);
+        if ( $has_clockrate == 0 ) {
+            die "\nWarning! the file doesn't seem to have clock rates.\n\n";
+        }
+    }
+
 
     ## Set filehandle for printing.
     if ($outfile eq '') {
@@ -256,7 +267,7 @@ MAIN:
             print $PRINT_FH "Burnin in generations : $burngen.\n";
         }
         if ($is_tree_file) {
-            my $has_brlens = test_brlens_presence($infile);
+            my $has_brlens = test_has_brlens($infile);
             if ($has_brlens) {
                 print $PRINT_FH "Trees appear to have branch lengths.\n";
             }
@@ -295,6 +306,9 @@ MAIN:
             #if ($rmbrlens) { # Should rmbrlens here once. No strip_brlens_print needed?
             #    #$_ = ;
             #}
+            if ($myr) {
+                $_ = brlen2time($_);
+            }
             if ($rmcomments) {
                 $_ = remove_figtree_comments($_);
             }
@@ -318,7 +332,7 @@ MAIN:
                 }
             }
             if ($i == $end) { # If last tree
-                last unless $is_tree_file; ##############################################
+                last unless $is_tree_file; #
                 if ($rmbrlens) {  # If --rmbrlens,
                     print STDERR "\n=== print 1:(i:$i j:$j) ===" if $DEBUG;
                     if ($random_nr <  $ifeellucky) {
@@ -425,10 +439,54 @@ MAIN:
 
 ## End of MAIN
 
+#===  FUNCTION  ================================================================
+#         NAME:  brlen2time
+#      VERSION:  04/09/2013 01:49:02 PM
+#  DESCRIPTION:  Transform branch lengths from substitutions per site to time units
+#   PARAMETERS:  tree string
+#   tree gen.5000000[&B Igrbranchlens{all}] = [&R] [&clockrate=8.332129945298162e-04] (1:4.907239999154218e-02[&B Igrbranchlens{all} 5.967617061002457e-02],(...
+#   
+#      RETURNS:  tree string
+#         TODO:  ???
+#===============================================================================
+sub brlen2time {
+
+    my ($tree) = @_;
+
+    $tree =~ m/&clockrate\s*=\s*(\d+\.?\d*([eE][+-]?\d+)?)\]/i;
+    my $clockrate = $1;
+
+    ## Iterate over tree and substitute all branch lengths with the age:
+    $tree =~ s/:(\d+\.?\d*([eE][+-]?\d+)?)/brlen2time_print($clockrate,$1)/ieg;
+
+    return($tree);
+
+} # end brlen2time
+
+
+#===  FUNCTION  ================================================================
+#         NAME: brlen2time_print
+#      VERSION: 04/10/2013 09:34:53 AM
+#  DESCRIPTION: print branch lengths in time units PLUS an ad hoc ':'!
+#   PARAMETERS: clockrate, branch length
+#      RETURNS: string (decimal number) and a colon(!) :89.001
+#         TODO: Work around the ':' when used with brlen2time
+#===============================================================================
+sub brlen2time_print {
+
+    my($cr, $bl) = @_;
+
+    my $myr = sprintf ":%f", $bl/$cr;
+
+    return($myr);
+
+} # end of brlen2time_print
+
+
 
 #===  FUNCTION  ================================================================
 #         NAME:  print_debug
-#      VERSION:  02/01/2013 04:30:33 PM
+#      VERSION:  04/10/2013 09:46:27 AM
 #  DESCRIPTION:  debug printing
 #   PARAMETERS:  number
 #      RETURNS:  prints to STDERR
@@ -439,13 +497,38 @@ sub print_debug {
     my ($number) = @_;
 
     print STDERR "\n\n= $number ==============\n";
-    print STDERR "start:$start.\nend:$end.\nburnin:$burnin.\npburnin:$pburnin.\njump:$jump.\n";
-    print STDERR "treesonly:$treesonly.\nclose:$close.\nnoclose:$noclose.\nrmbrlens:$rmbrlens.\nsci2norm:$sci2norm.\ngetinfo:$getinfo.\n";
-    print STDERR "infile:$infile.\nlastgen:$lastgen.\nnexttolastgen:$nexttolastgen.\n";
-    print STDERR "match:$match.\nis_tree_file:$is_tree_file.\ni:$i.\nj:$j.\nifeellucky:$ifeellucky.\nrandom_nr:$random_nr.\n";
-    print STDERR "labels:$labels.\nnolabels:$nolabels.\nformat:$format.\nfigtree:$figtree.\noutfile:$outfile.\n";
-    #print STDERR "concatenate: $concatenate.\n\n";
+    print STDERR "burnin:$burnin.\n";
+    print STDERR "close:$close.\n";
+    print STDERR "end:$end.\n";
+    print STDERR "figtree:$figtree.\n";
+    print STDERR "format:$format.\n";
+    print STDERR "getinfo:$getinfo.\n";
+    print STDERR "help:$help\n";
+    print STDERR "i:$i.\n";
+    print STDERR "ifeellucky:$ifeellucky.\n";
+    print STDERR "infile:$infile.\n";
+    print STDERR "is_tree_file:$is_tree_file.\n";
+    print STDERR "j:$j.\n";
+    print STDERR "jump:$jump.\n";
+    print STDERR "labels:$labels.\n";
+    print STDERR "lastgen:$lastgen.\n";
+    print STDERR "match:$match.\n";
+    print STDERR "myr:$myr\n";
+    print STDERR "nexttolastgen:$nexttolastgen.\n";
+    print STDERR "noclose:$noclose.\n";
+    print STDERR "nolabels:$nolabels.\n";
+    print STDERR "ntrees:$ntrees\n";
+    print STDERR "outfile:$outfile.\n";
+    print STDERR "pburnin:$pburnin.\n";
+    print STDERR "random_nr:$random_nr.\n";
+    print STDERR "rmbrlens:$rmbrlens.\n";
+    print STDERR "rmcomments:$rmcomments\n";
+    print STDERR "sci2norm:$sci2norm.\n";
+    print STDERR "start:$start.\n";
+    print STDERR "treesonly:$treesonly.\n";
+    print STDERR "altnexus_treesonly:$altnexus_treesonly\n";
     print STDERR "==================\n";
+
     warn "\n (hit return to continue)\n" and getc();
 
 } # end of print_debug
@@ -689,7 +772,7 @@ sub strip_brlens_print {
 
 
 #===  FUNCTION  ================================================================
-#         NAME:  test_brlens_presence
+#         NAME:  test_has_brlens
 #      VERSION:  02/02/2007 12:12:05 AM CET
 #  DESCRIPTION:  Tests for presence of branch lengths in the tree description.
 #                Warning: no error checking. Assumes Nexus tree format.
@@ -697,7 +780,7 @@ sub strip_brlens_print {
 #      RETURNS:  1: brlens present, 0: brlens absent
 #         TODO:  ?
 #===============================================================================
-sub test_brlens_presence {
+sub test_has_brlens {
 
     my ($file) = @_;
     my $brl    = 0;
@@ -715,7 +798,38 @@ sub test_brlens_presence {
 
     return $brl;
 
-} # end of test_brlens_presence
+} # end of test_has_brlens
+
+
+#===  FUNCTION  ================================================================
+#         NAME:  test_has_clockrate
+#      VERSION:  04/09/2013 01:37:48 PM
+#  DESCRIPTION:  Tests for presence of clockrate in the tree description.
+#                Warning: no error checking. Assumes MrBayes clock tree format.
+#                tree gen.5000000[&B Igrbranchlens{all}] = [&R] [&clockrate=8.332129945298162e-04] (1:4.907...
+#   PARAMETERS:  string containing tree description
+#      RETURNS:  1: clockrate present, 0: clockrate absent
+#         TODO:  ?
+#===============================================================================
+sub test_has_clockrate {
+
+    my ($file) = @_;
+    my $clr    = 0;
+
+    open (my $FILE, '<', $file) or die "$0 : failed to open input file $file : $!\n";
+    while(<$FILE>) {
+        if(/^\s*tree/i) {
+            if ( $_ =~ /&clockrate/ ) {
+                $clr = 1;
+            }
+            last;
+        }
+    }
+    close ($FILE) or warn "$0 : failed to close file $file : $!\n";
+
+    return $clr;
+
+} # end of test_has_clockrate
 
 
 #===  FUNCTION  ================================================================
@@ -749,10 +863,8 @@ sub test_figtree_format {
 } # end of test_figtree_format
 
 
-
-
 #===  POD DOCUMENTATION  =======================================================
-#      VERSION:  03/18/2013 11:35:47 AM
+#      VERSION:  04/09/2013 09:43:24 AM
 #  DESCRIPTION:  Documentation
 #         TODO:  ?
 #===============================================================================
@@ -766,12 +878,12 @@ burntrees.pl
 
 =head1 VERSION
 
-Documentation for burntrees.pl version 0.2.0
+Documentation for burntrees.pl version 0.2.1
 
 
 =head1 SYNOPSIS
 
-burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
+burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--sci2norm] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
 
 =head1 DESCRIPTION
@@ -791,6 +903,8 @@ The samples can be thinned by setting a value for how many trees to jump before 
 Branch lengths and/or comments (if present) can be removed from trees before printing.
 
 Branch lengths in scientific numeric format can be transformed to a fixed numeric format.
+
+MrBayes clock trees with branch lengths in substitutions per site can be transformed to branch lengths in time units.
 
 A random set of trees can be printed from the tree file.
 
@@ -864,9 +978,14 @@ Print trees using sequence (taxon) labels instead of the sequence numbers from t
 B<--nolabels> (which is the default) prevents the sequence numbers to be substituted.
 
 
-=item B<-m, --man>
+=item B<-ma, --man>
 
 Displays the manual page.
+
+
+=item B<-my, --myr>
+
+Transform branch lengths in a MrBayes clock tree from substitutions per site to time units.
 
 
 =item B<-o, --outfile=>I<file_name>
@@ -980,7 +1099,12 @@ To change the branch length format from scientific to numerical use
 
   burntrees.pl --sci2norm data.con.tre
 
- 
+
+To change the MrBayes clock branch length format from substitutions per site to time units (Myr) use
+
+  burntrees.pl --myr clock.t
+  burntrees.pl --myr --rmcomments clock.t
+
 
 =head1 AUTHOR
 

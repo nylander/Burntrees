@@ -41,12 +41,12 @@
 </p>
 <hr />
 <h1><a name="version">VERSION</a></h1>
-<p>Documentation for burntrees.pl version 0.2.0</p>
+<p>Documentation for burntrees.pl version 0.2.1</p>
 <p>
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>burntrees.pl [--burnin=&lt;number&gt;] [--pburnin=&lt;number&gt;] [--start=&lt;number&gt;] [--end=&lt;number&gt;] [--jump=&lt;number&gt;] [--IFeelLucky=&lt;number&gt;] [--treesonly] [--rmbrlens] [--rmcomments] [--sci2norm] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=&lt;file_name&gt;] FILE [&gt; OUTPUT]</p>
+<p>burntrees.pl [--burnin=&lt;number&gt;] [--pburnin=&lt;number&gt;] [--start=&lt;number&gt;] [--end=&lt;number&gt;] [--jump=&lt;number&gt;] [--IFeelLucky=&lt;number&gt;] [--treesonly] [--rmbrlens] [--rmcomments] [--sci2norm] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=&lt;file_name&gt;] FILE [&gt; OUTPUT]</p>
 <p>
 </p>
 <hr />
@@ -60,6 +60,7 @@ from tree file.</p>
 <p>The samples can be thinned by setting a value for how many trees to jump before next is printed.</p>
 <p>Branch lengths and/or comments (if present) can be removed from trees before printing.</p>
 <p>Branch lengths in scientific numeric format can be transformed to a fixed numeric format.</p>
+<p>MrBayes clock trees with branch lengths in substitutions per site can be transformed to branch lengths in time units.</p>
 <p>A random set of trees can be printed from the tree file.</p>
 <p>Lines can also be extracted from a MrBayes *.p file.</p>
 <p>Trees can be printed in Phylip (Newick) format or as altnexus (sequence labels instead of numbers),
@@ -126,10 +127,15 @@ Note that <strong>--IFeelLucky</strong> has precedence over <strong>--jump</stro
 <p>Print trees using sequence (taxon) labels instead of the sequence numbers from the translation table.
 <strong>--nolabels</strong> (which is the default) prevents the sequence numbers to be substituted.</p>
 </dd>
-<dt><strong><a name="m_man" class="item"><strong>-m, --man</strong></a></strong></dt>
+<dt><strong><a name="ma_man" class="item"><strong>-ma, --man</strong></a></strong></dt>
 
 <dd>
 <p>Displays the manual page.</p>
+</dd>
+<dt><strong><a name="my_myr" class="item"><strong>-my, --myr</strong></a></strong></dt>
+
+<dd>
+<p>Transform branch lengths in a MrBayes clock tree from substitutions per site to time units.</p>
 </dd>
 <dt><strong><a name="o_outfile_file_name" class="item"><strong>-o, --outfile=</strong><em>file_name</em></a></strong></dt>
 
@@ -229,7 +235,10 @@ BEAST or other phylogenetic MCMC software (not thoroughly tested!).</p>
 <p>To change the branch length format from scientific to numerical use</p>
 <pre>
   burntrees.pl --sci2norm data.con.tre</pre>
-<p></p>
+<p>To change the MrBayes clock branch length format from substitutions per site to time units (Myr) use</p>
+<pre>
+  burntrees.pl --myr clock.t
+  burntrees.pl --myr --rmcomments clock.t</pre>
 <p>
 </p>
 <hr />

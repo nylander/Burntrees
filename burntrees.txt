@@ -2,14 +2,14 @@ NAME
     burntrees.pl
 
 VERSION
-    Documentation for burntrees.pl version 0.2.0
+    Documentation for burntrees.pl version 0.2.1
 
 SYNOPSIS
     burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>]
     [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly]
-    [--rmbrlens] [--rmcomments] [--sci2norm] [--[no]close] [--getinfo]
-    [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE
-    [> OUTPUT]
+    [--rmbrlens] [--rmcomments] [--sci2norm] [--myr] [--[no]close]
+    [--getinfo] [--[no]labels] [--format=altnexus|phylip]
+    [--outfile=<file_name>] FILE [> OUTPUT]
 
 DESCRIPTION
     Script for manipulating tree (*.t, *.trprobs, *.con, *.trees) and
@@ -31,6 +31,9 @@ DESCRIPTION
 
     Branch lengths in scientific numeric format can be transformed to a
     fixed numeric format.
+
+    MrBayes clock trees with branch lengths in substitutions per site can be
+    transformed to branch lengths in time units.
 
     A random set of trees can be printed from the tree file.
 
@@ -85,8 +88,12 @@ OPTIONS
             sequence numbers from the translation table. --nolabels (which
             is the default) prevents the sequence numbers to be substituted.
 
-    -m, --man
+    -ma, --man
             Displays the manual page.
+
+    -my, --myr
+            Transform branch lengths in a MrBayes clock tree from
+            substitutions per site to time units.
 
     -o, --outfile=*file_name*
             Print directly to file *file_name* instead of standard out.
@@ -173,6 +180,12 @@ USAGE
     To change the branch length format from scientific to numerical use
 
       burntrees.pl --sci2norm data.con.tre
+
+    To change the MrBayes clock branch length format from substitutions per
+    site to time units (Myr) use
+
+      burntrees.pl --myr clock.t
+      burntrees.pl --myr --rmcomments clock.t
 
 AUTHOR
     Written by Johan A. A. Nylander
