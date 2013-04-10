@@ -4,17 +4,15 @@ Burntrees
 burntrees.pl:
 -------------
 
-Perl script for printing and manipulating MrBayes tree files (*.t, and
-*.con files), MrBayes parameter files (*.p files), or other Nexus-
-formatted tree files. Can also handle output from BEAST (*.trees and *.log files)
+Perl script for printing and manipulating MrBayes tree files (\*.t, and
+\*.con files), MrBayes parameter files (\*.p files), or other Nexus-
+formatted tree files. Can also handle output from BEAST (\*.trees and \*.log files)
 
-Written by:
------------
+### Written by:
 
 Johan Nylander
 
-Files:
-------
+### Files:
 
 * burntrees.pl   -- the Perl script
 
