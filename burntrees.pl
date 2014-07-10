@@ -12,8 +12,8 @@ use Data::Dumper;
 
 ## Globals
 my $scriptname         = $0;
-my $VERSION            = '0.2.1';
-my $CHANGES            = '04/09/2013 09:38:26 AM';
+my $VERSION            = '0.2.2';
+my $CHANGES            = '07/10/2014 03:59:09 PM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
@@ -708,7 +708,7 @@ sub replace_numbers {
 
 #===  FUNCTION  ================================================================
 #         NAME: sci2norm
-#      VERSION: 02/03/2013 05:44:21 PM
+#      VERSION: 07/10/2014 04:16:09 PM
 #  DESCRIPTION: translate tree string with branch lengths in scientific notation
 #               to normal notation
 #   PARAMETERS: tree string
@@ -720,8 +720,7 @@ sub sci2norm {
 
     my ($tree) = @_;
 
-    #$tree =~ s/:(\d+\.\d+e[\+|\-]\d+)/sci2norm_colon($1)/ieg;
-    $tree =~ s/(\d+\.\d+e[\+|\-]\d+)/sci2norm_no_colon($1)/ieg;
+    $tree =~ s/(\d+\.\d+e[\+|\-]\d+)/sci2norm_print($1)/ieg;
 
     return($tree);
 
@@ -749,7 +748,7 @@ sub sci2norm_print {
 
 #===  FUNCTION  ================================================================
 #         NAME:  strip_brlens_print
-#      VERSION:  02/13/2013 09:25:00 AM
+#      VERSION:  07/10/2014 04:08:11 PM
 #  DESCRIPTION:  Removes the branch lengths from a tree descriptions and print
 #   PARAMETERS:  tree string
 #      RETURNS:  Void. Prints to $PRINT_FH
@@ -759,8 +758,8 @@ sub strip_brlens_print {
 
     ($_) = @_; 
     
-    if (/e-\d+/i) { # if scientific notation ":1.309506485347851e-01" or ":1.309506485347851E-01"
-        $_ =~ s/:[\d\.e\-]+//gi;
+    if (/e[-+]\d+/i) { # if scientific notation ":1.309506485347851e-01" or ":1.309506485347851E-01" or ":1.053210e+00"
+        $_ =~ s/:[e\d\.\-\+]+//gi;
     }
     else {
         $_ =~ s/:[\d\.]+//g; # Search for any pattern such as ":0.033372" and replace with nothing
@@ -864,7 +863,7 @@ sub test_figtree_format {
 
 
 #===  POD DOCUMENTATION  =======================================================
-#      VERSION:  04/09/2013 09:43:24 AM
+#      VERSION:  07/10/2014 04:01:02 PM
 #  DESCRIPTION:  Documentation
 #         TODO:  ?
 #===============================================================================
@@ -878,7 +877,7 @@ burntrees.pl
 
 =head1 VERSION
 
-Documentation for burntrees.pl version 0.2.1
+Documentation for burntrees.pl version 0.2.2
 
 
 =head1 SYNOPSIS
@@ -1128,7 +1127,7 @@ https://github.com/nylander/Burntrees
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006--2013, Johan Nylander.
+Copyright (c) 2006--2014, Johan Nylander.
 All rights reserved.
 
 This program is free software; you can redistribute it and/or

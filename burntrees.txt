@@ -2,7 +2,7 @@ NAME
     burntrees.pl
 
 VERSION
-    Documentation for burntrees.pl version 0.2.1
+    Documentation for burntrees.pl version 0.2.2
 
 SYNOPSIS
     burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>]
@@ -200,7 +200,7 @@ DOWNLOAD
     https://github.com/nylander/Burntrees
 
 LICENSE AND COPYRIGHT
-    Copyright (c) 2006--2013, Johan Nylander. All rights reserved.
+    Copyright (c) 2006--2014, Johan Nylander. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
