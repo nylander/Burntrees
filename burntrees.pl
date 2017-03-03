@@ -11,8 +11,8 @@ use Data::Dumper;
 
 ## Globals
 my $scriptname         = $0;
-my $VERSION            = '0.3.0';
-my $CHANGES            = '08/29/2016 11:32:21 AM';
+my $VERSION            = '0.3.0'; # Also in POD
+my $CHANGES            = '03/02/2017 03:03:15 PM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{}; # q{} is empty
 my $close              = q{};
@@ -43,7 +43,6 @@ my $rmbrlens           = q{};
 my $rmcomments         = q{};
 my $rmsupport          = q{};
 my $sci2norm           = q{};
-my $seed               = q{};
 my $start              = q{};
 my $treesonly          = q{};
 my $altnexus_treesonly = q{};
@@ -54,7 +53,6 @@ my $PRINT_FH;
 
 ## "MAIN" routine
 MAIN:
-    ## Handle arguments
     if (@ARGV < 1) {
         print "\n Try '$scriptname --man' for full info\n\n";
         exit(0);
@@ -82,7 +80,6 @@ MAIN:
                    'rmcomments'   => \$rmcomments,
                    'rmsupport'    => \$rmsupport,
                    'sci2norm:-1'  => \$sci2norm,
-                   'seed:i'       => \$seed,
                    'start:i'      => \$start,
                    'treesonly'    => \$treesonly,
                   );
@@ -96,16 +93,16 @@ MAIN:
         $jump = '1';
     }
 
-    ## --noclose is stronger than --close 
+    ## --noclose is stronger than --close
     if ($noclose) {
         $close = 0;
     }
 
     ## Get ONE infile from ARGV.
-    if (@ARGV > 0) { 
+    if (@ARGV > 0) {
         $infile = shift(@ARGV);
     }
-    
+
     COUNTANDCHECK:
     ## First: count trees and check file type
     open (my $IN, '<', $infile) or die "$0 : failed to open input file $infile : $!\n";
@@ -139,6 +136,7 @@ MAIN:
         elsif (/\)\s*;\s*$/) {                 # A phylobase tree file have newick trees on one line
             $is_tree_file = 1;
             $match = '^\s*\(';
+            $ntrees++;
             next;
         }
         elsif ((/^\s*Gen/i) or (/^\s*state/i) or (/^\s*#cycle/i) ) { # A .p file contains "Gen", a BEAST log file contains "STATE",
@@ -148,9 +146,10 @@ MAIN:
         }
     }
     close ($IN) or warn "$0 : failed to close input file $infile : $!\n";
+
     ## Error if no match set (neither a .p nor a .t file)
     if ($match eq 'Peppes_Bodega') {
-        die "\nInfile doesn't seem to be a tree file (or a p file)\n"
+        die "\nInfile doesn't seem to be a tree file (or a p file)?\n"
     };
 
     BURNIN:
@@ -166,14 +165,13 @@ MAIN:
             $start = '1';
         }
     }
+
     ## Set probability printing defaults
     if ($ifeellucky eq '') {
         $ifeellucky = 1;
         $random_nr = 0;
     }
-    elsif ($seed) {
-        srand $seed;
-    }
+
     ## Set --end default to $ntrees if no --end
     if ($end eq '') {
         $end = $ntrees;
@@ -187,6 +185,7 @@ MAIN:
             die "\nWarning! the file doesn't seem to have branch lengths.\n\n";
         }
     }
+
     ## Test if support values
     if ($rmsupport) {
         my $has_support = test_has_support($infile);
@@ -194,6 +193,7 @@ MAIN:
             die "\nWarning! the file doesn't seem to have support values.\n\n";
         }
     }
+
     ## Test clockrate if myr
     if ($myr) {
         my $has_clockrate = test_has_clockrate($infile);
@@ -201,6 +201,7 @@ MAIN:
             die "\nWarning! the file doesn't seem to have clock rates.\n\n";
         }
     }
+
     ## Set filehandle for printing.
     if ($outfile eq '') {
         $PRINT_FH = *STDOUT; # Using the typeglob notation in order to use STDOUT as a variable
@@ -213,7 +214,7 @@ MAIN:
     ## Set output format (altnexus or phylip)
     if ($format ne '') {
         if ($is_tree_file) { # --format only applicable on tree files
-            $figtree = test_figtree_format($infile); 
+            $figtree = test_figtree_format($infile);
             if ($format =~ m/^a/i) {
                 $format = 'altnexus';
                 if ($nolabels) {
@@ -252,6 +253,7 @@ MAIN:
             die "\nWarning! argument 'format' is only applicable on tree files.\n\n"
         }
     }
+
     ## Read the translation table
     if ($labels) {
         %translation_table = read_labels($infile);
@@ -260,8 +262,12 @@ MAIN:
     GETINFO:
     ## If --getinfo, print number of trees etc and quit
     if ($getinfo) {
-        my $thinning = $lastgen - $nexttolastgen;
-        my $totgen = $thinning * ($ntrees - 1);
+        my $thinning;
+        my $totgen;
+        if ($lastgen) {
+            $thinning = $lastgen - $nexttolastgen;
+            $totgen = $thinning * ($ntrees - 1);
+        }
         my $word = 'lines';
         if ($is_tree_file) {
             $word = 'trees';
@@ -271,7 +277,7 @@ MAIN:
             my $Ntrees = $end - $start + 1;
             print $PRINT_FH "Number of $word after burnin : $Ntrees\n";
         }
-        if ($lastgen > 1) { # If no 'rep' in tree file, $lastgen was set to 1 (then probably not a Mrbayes *.t file)
+        if (($lastgen) && ($lastgen > 1)) { # If no 'rep' in tree file, $lastgen was set to 1 (then probably not a Mrbayes *.t file)
             print $PRINT_FH "Thinning seems to have been : $thinning\n";
             print $PRINT_FH "Number of generations was then : $totgen\n";
         }
@@ -360,26 +366,29 @@ MAIN:
                 $_ = remove_support($_);
             }
             if ($i == $end) { # If last tree
-                if ($rmbrlens) {  # If --rmbrlens,
+                if ($rmbrlens) {
                     print STDERR "\n=== print 1:(i:$i j:$j) ===" if $DEBUG;
                     if ($random_nr <  $ifeellucky) {
                         strip_brlens_print($_) if ( ($i % $jump) == 0 ); # Print with no branch lengths if modulus is 0.
                         if ($close) {
-                            print $PRINT_FH "END; [DEBUG:close]\n" unless ($format eq 'phylip');
+                            my $l = $DEBUG ? "END; [DEBUG:close]\n" : "END;\n";
+                            print $PRINT_FH $l unless ($format eq 'phylip');
                             last;
                         }
                         elsif ($noclose) {
                             last;
                         }
                         elsif ($format eq 'altnexus') {
-                            print $PRINT_FH "END; [DEBUG:altnex]\n" unless ($altnexus_treesonly);
+                            my $l = $DEBUG ? "END; [DEBUG:altnex]\n" : "END;\n";
+                            print $PRINT_FH $l unless ($altnexus_treesonly);
                             last;
                         }
                         elsif ($treesonly) {
                             last;
                         }
                         else {
-                            print $PRINT_FH "END; [DEBUG:default]\n" unless ($format eq 'phylip');
+                            my $l = $DEBUG ? "END; [DEBUG:default]\n" : "END;\n";
+                            print $PRINT_FH $l unless ($format eq 'phylip');
                             last;
                         }
                     }
@@ -388,23 +397,27 @@ MAIN:
                     print STDERR "\n=== print 2:(i:$i j:$j) ===" if $DEBUG;
                     if ($random_nr <  $ifeellucky) {
                         #print Dumper($i) and getc();print Dumper($jump) and getc(); # DEBUG:
-                        print $PRINT_FH "$_ [DEBUG:bpa]\n" if ( ($i % $jump) == 0 ); # Print with branch lengths if modulus is 0.
+                        my $l = $DEBUG ? "$_ [DEBUG:bpa]\n" : "$_\n";
+                        print $PRINT_FH $l if ( ($i % $jump) == 0 ); # Print with branch lengths if modulus is 0.
                         if ($close) {
-                            print $PRINT_FH "END; [DEBUG:cpa]\n" unless ($format eq 'phylip');
+                            my $l = $DEBUG ? "END; [DEBUG:cpa]\n" : "END;\n";
+                            print $PRINT_FH $l unless ($format eq 'phylip');
                             last;
                         }
                         elsif ($noclose) {
                             last;
                         }
                         elsif ($format eq 'altnexus') {
-                            print $PRINT_FH "END; [DEBUG:dpa]\n" unless ($altnexus_treesonly);
+                            my $l = $DEBUG ? "END; [DEBUG:dpa]\n" : "END;\n";
+                            print $PRINT_FH $l unless ($altnexus_treesonly);
                             last;
                         }
                         elsif ($treesonly) {
                             last;
                         }
                         elsif ($is_tree_file) {
-                            print $PRINT_FH "END; [DEBUG:epa]\n" unless ($format eq 'phylip');
+                            my $l = $DEBUG ? "END; [DEBUG:epa]\n" : "END;\n";
+                            print $PRINT_FH $l unless ($format eq 'phylip');
                             last;
                         }
                     }
@@ -424,7 +437,8 @@ MAIN:
                         print STDERR "\n=== print 4:(i:$i j:$j) ===" if $DEBUG;
                         if ($random_nr <  $ifeellucky) {
                             #print Dumper($i) and getc();print Dumper($jump) and getc(); # DEBUG:
-                            print $PRINT_FH "$_ [DEBUG:fpa]\n";
+                            my $l = $DEBUG ? "$_ [DEBUG:fpa]\n" : "$_\n";
+                            print $PRINT_FH $l;
                         }
                         $j = 1; # DEBUG: START HERE
                         #$j = 0;
@@ -441,7 +455,8 @@ MAIN:
                         print STDERR "\n=== print 6:(i:$i j:$j) ===" if $DEBUG;
                         if ($random_nr <  $ifeellucky) {
                             #print Dumper($i) and getc();print Dumper($jump) and getc(); # DEBUG:
-                            print $PRINT_FH "$_ [DEBUG:gpa]\n" if ( ($j % $jump) == 0 );
+                            my $l = $DEBUG ? "$_ [DEBUG:gpa]\n" : "$_\n";
+                            print $PRINT_FH $l if ( ($j % $jump) == 0 );
                         }
                     }
                 }
@@ -452,10 +467,12 @@ MAIN:
         else { # If string is not a tree, it's either taxa descriptions or a trailing end
             if ($i > $end) {
                 print STDERR "\n=== print 7:(i:$i j:$j) ===" if $DEBUG;
-                print $PRINT_FH "$_ [DEBUG:hpa]\n" unless ($noclose);
+                my $l = $DEBUG ? "$_ [DEBUG:hpa]\n" : "$_\n";
+                print $PRINT_FH $l unless ($noclose);
             }
             else {
-                print $PRINT_FH "$_ [DEBUG:ipa]\n" unless ($treesonly);
+                my $l = $DEBUG ? "$_ [DEBUG:ipa]\n" : "$_\n";
+                print $PRINT_FH $l unless ($treesonly);
             }
         }
     }
@@ -580,7 +597,6 @@ sub print_debug {
     print STDERR "rmcomments:$rmcomments.\n";
     print STDERR "rmsupport:$rmsupport.\n";
     print STDERR "sci2norm:$sci2norm.\n";
-    print STDERR "seed:$seed.\n";
     print STDERR "start:$start.\n";
     print STDERR "treesonly:$treesonly.\n";
     print STDERR "altnexus_treesonly:$altnexus_treesonly.\n";
@@ -632,41 +648,6 @@ sub read_labels {
 
 } # end of read_labels
 
-## Keep this alternative code for reading labels from MrBayes/BEAST?
-#sub read_labels {
-#
-#    my ($file) = @_;
-#    my %hash = ();
-#
-#    open (my $FILE, '<', $file) or die "$0 : failed to open input file $file : $!\n";
-#    while(<$FILE>) {
-#        if((/\s*tree\s+rep/i) or ((/\s*tree\s+state/i))) {
-#            last;
-#        }
-#        if(/^\s+\d+\s+\b/) {
-#            my ($number, $name_x) = split;
-#            my @letters = split //, $name_x;
-#            if ( ($letters[-1] eq ",") or ($letters[-1] eq ";") ) {
-#                pop @letters;
-#            }
-#            my $name = join "", @letters;
-#            $hash{$number} = $name;
-#        }
-#    }
-#    close ($FILE) or warn "$0 : failed to close file $file : $!\n";
-#
-#    if ($DEBUG) {
-#        print STDERR "\nhash in read_labels:\n";
-#        for my $key ( keys %hash ) {
-#            my $value = $hash{$key};
-#            print STDERR "$key => $value\n";
-#        }
-#    }
-#
-#    return %hash;
-#
-#} # end of read_labels
-
 
 #===  FUNCTION  ================================================================
 #         NAME: remove_figtree_comments
@@ -699,7 +680,7 @@ sub remove_figtree_comments {
 #===  FUNCTION  ================================================================
 #         NAME: remove_support
 #      VERSION: 08/16/2016 01:20:53 PM
-#  DESCRIPTION: Removes the support values from simple newick string.
+#  DESCRIPTION: Removes the support values from simple newick string:
 #               )1.00000000e+00) -> ))
 #               )1.00000000e+00:3.231983e-02) -> ):3.231983e-02)
 #               )100) -> ))
@@ -707,7 +688,7 @@ sub remove_figtree_comments {
 #
 #   PARAMETERS: tree string
 #      RETURNS: tree string without support values
-#         TODO: testing! 
+#         TODO: testing!
 #===============================================================================
 sub remove_support {
 
@@ -731,7 +712,7 @@ sub remove_support {
 #               Make sure the hack is no longer needed!
 #===============================================================================
 sub remove_tree_name {
-    
+
     my ($line) = (@_);
     my $tree   = '';
 
@@ -756,7 +737,7 @@ sub remove_tree_name {
 #===  FUNCTION  ================================================================
 #         NAME: replace_numbers
 #      VERSION: 02/03/2013 04:13:04 PM
-#  DESCRIPTION: replaces numbers with sequence (taxon) labels.
+#  DESCRIPTION: Replaces numbers with sequence (taxon) labels.
 #               Possible matches and replacements are
 #                   ',123:' => ',foo:'
 #                   ',123,' => ',foo,'
@@ -791,8 +772,8 @@ sub replace_numbers {
 #===  FUNCTION  ================================================================
 #         NAME: sci2norm
 #      VERSION: 07/10/2014 04:16:09 PM
-#  DESCRIPTION: translate tree string with branch lengths in scientific notation
-#               to normal notation
+#  DESCRIPTION: Translate tree string with branch lengths in scientific notation
+#               to normal notation.
 #   PARAMETERS: tree string
 #      RETURNS: tree string
 #         TODO: test on p files with scientific notation
@@ -805,13 +786,13 @@ sub sci2norm {
 
     return($tree);
 
-} # end of sci2norm 
+} # end of sci2norm
 
 
 #===  FUNCTION  ================================================================
 #         NAME: sci2norm_print
 #      VERSION: 08/12/2016 05:36:38 PM
-#  DESCRIPTION: translate string of scientific number notation to decimal number
+#  DESCRIPTION: Translate string of scientific number notation to decimal number.
 #   PARAMETERS: string (scientific notation, e.g. "1.600103158188143e-02")
 #      RETURNS: string (decimal number, e.g. "0.016001")
 #===============================================================================
@@ -834,15 +815,15 @@ sub sci2norm_print {
 #===  FUNCTION  ================================================================
 #         NAME: strip_brlens_print
 #      VERSION: 07/10/2014 04:08:11 PM
-#  DESCRIPTION: Removes the branch lengths from a tree descriptions and print
+#  DESCRIPTION: Removes the branch lengths from a tree descriptions and print.
 #   PARAMETERS: tree string
 #      RETURNS: Void. Prints to $PRINT_FH
 #===============================================================================
 sub strip_brlens_print {
 
-    ($_) = @_; 
-    
-    if (/e[-+]\d+/i) { # if scientific notation ":1.309506485347851e-01" or ":1.309506485347851E-01" or ":1.053210e+00"
+    ($_) = @_;
+
+    if (/e[-+]\d+/i) { # ":1.309506485347851e-01" or ":1.309506485347851E-01" or ":1.053210e+00"
         $_ =~ s/:[e\d\.\-\+]+//gi;
     }
     else {
@@ -900,7 +881,7 @@ sub test_has_brlens {
 #  DESCRIPTION: Tests for presence of clockrate in the tree description.
 #               Warning: no error checking. Assumes MrBayes clock tree format.
 #               tree gen.5000000[&B Igrbranchlens{all}] = [&R] [&clockrate=8.332129945298162e-04] (1:4.907...
-#   PARAMETERS: string containing tree description
+#   PARAMETERS: String containing tree description.
 #      RETURNS: 1: clockrate present, 0: clockrate absent
 #===============================================================================
 sub test_has_clockrate {
@@ -927,9 +908,10 @@ sub test_has_clockrate {
 
 #===  FUNCTION  ================================================================
 #         NAME: test_has_support
-#      VERSION: 08/12/2016 02:54:09 PM
+#      VERSION: 03/03/2017 12:10:35 PM
 #  DESCRIPTION: Tests for presence of support values in the tree description.
-#               Warning: no error checking. Assumes Nexus tree format.
+#               Warning: no error checking.
+#               Assumes Nexus or Newick tree format (tree on single line).
 #   PARAMETERS: string containing tree description
 #      RETURNS: 1: support values present, 0: support values absent
 #===============================================================================
@@ -941,7 +923,7 @@ sub test_has_support {
     open (my $FILE, '<', $file) or die "$0 : failed to open input file $file : $!\n";
     while(<$FILE>) {
         chomp;
-        if(/^\s*tree/i) {
+        if((/^\s*tree/i) || (/\)\s*;\s*$/)) {
             if (/\[/) {
                 if (/&prob=\d+/i) {
                     $support = 1;
@@ -996,7 +978,7 @@ sub test_figtree_format {
 
 
 #===  POD DOCUMENTATION  =======================================================
-#      VERSION: 08/23/2016 05:51:54 PM
+#      VERSION: 03/03/2017 01:44:23 PM
 #  DESCRIPTION: Documentation
 #         TODO: Add examples using rmsupport and about converting .con.tre files
 #===============================================================================
@@ -1015,7 +997,7 @@ Documentation for burntrees.pl version 0.3.0
 
 =head1 SYNOPSIS
 
-burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>] [--seed=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
+burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
 
 =head1 DESCRIPTION
@@ -1080,7 +1062,7 @@ If no B<--end> is given, prints to last tree in file.
 
 =item B<-f, --format=>I<format>
 
-Trees are printed as specified by I<format>, where I<format> is either I<altnexus>: with sequence (taxon) labels instead of numbers, or I<phylip> (the Newick format). 
+Trees are printed as specified by I<format>, where I<format> is either I<altnexus>: with sequence (taxon) labels instead of numbers, or I<phylip> (the Newick format).
 
 
 =item B<-g, --getinfo>
@@ -1096,7 +1078,6 @@ Prints help message and exits.
 =item B<-i, --IFeelLucky=>I<number>
 
 Specify a probability (value between 0 -- 1) for each tree to be printed. That is, print each tree with prob. I<number>.
-The B<-i> option can be combined with the option -B<seed> to create reproducible results.
 Note that B<--IFeelLucky> has precedence over B<--jump>.
 
 
@@ -1149,11 +1130,6 @@ Remove support values (bootstrap/posterior probabilities) from trees.
 =item B<-sc, --sci2norm=I<number>>
 
 Translate branch lengths from scientific to normal or fixed. Change the precision by specifying the (optimal) I<number>.
-
-
-=item B<-se, --seed=I<number>>
-
-Set a seed for the I<-i> option to create reproducible sampling results.
 
 
 =item B<-st, --start=>I<number>
@@ -1229,6 +1205,10 @@ To concatenate several files in to one altnexus formatted file, use (note the co
   burntrees.pl -b=40 -t    -l   data.run2.t >> data.t
   burntrees.pl -b=20 -t -c -l   data.run3.t >> data.t
 
+To extract the 10th tree in phylip format, use
+
+  burntrees.pl --start=10 --end=10 --format=phylip data.t
+
 To extract the second tree in the MrBayes .con.tre file (simple format) in phylip format, use
 
   burntrees.pl -b=1 -f=p data.con.tre
@@ -1237,7 +1217,7 @@ To remove comments from tree descriptions (e.g. trees in "figtree" format), use
 
   burntrees.pl --rmcomments data.con.tre
 
-To remove support values from tree description for the first tree in a MrBayes .con.tre file (simple format) while change branch lengths from scientific to normal (three decimals), use
+To remove support values from tree description for the first tree in a MrBayes .con.tre file (simple format) while changng branch lengths from scientific to normal (three decimals), use
 
   burntrees.pl --start=1 --end=1 --rmsupport --sci2norm=3 data.con.tre
 
@@ -1254,6 +1234,10 @@ To change the MrBayes clock branch length format from substitutions per site to 
   burntrees.pl --myr clock.t
   burntrees.pl --myr --rmcomments clock.t
 
+To (randomly) sample a specific number of trees, use burntrees.pl together with 'shuf'. Note that you could sample more trees than you have in your tree file (i.e., performing a bootstrap)!
+
+  burntrees.pl -t data.t | shuf -rn 10
+  burntrees.pl -t -t p data.t | shuf -rn 1000
 
 =head1 AUTHOR
 
@@ -1262,7 +1246,7 @@ Written by Johan A. A. Nylander
 
 =head1 REPORTING BUGS
 
-Please report any bugs to I<Johan.Nylander @ bils.se>.
+Please report any bugs to I<Johan.Nylander @ nbis.se>.
 
 
 =head1 DEPENDENCIES
@@ -1277,7 +1261,7 @@ https://github.com/nylander/Burntrees
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006-2016, Johan Nylander.
+Copyright (c) 2006-2017, Johan Nylander.
 All rights reserved.
 
 This program is free software; you can redistribute it and/or
@@ -1288,8 +1272,8 @@ of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details. 
-http://www.gnu.org/copyleft/gpl.html 
+GNU General Public License for more details.
+http://www.gnu.org/copyleft/gpl.html
 
 
 =cut

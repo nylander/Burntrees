@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 ## Use 'perldoc catmb.pl' or see the end of file for description.
 
@@ -192,7 +192,7 @@ Written by Johan A. A. Nylander
 
 =head1 REPORTING BUGS
 
-Please report any bugs to I<nylander @ scs.fsu.edu>.
+Please report any bugs to I<Johan.Nylander @ nbis.se>.
 
 
 =head1 DEPENDENCIES
@@ -208,7 +208,7 @@ https://github.com/nylander/Burntrees
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006--2016 Johan Nylander. All rights reserved.
+Copyright (c) 2006--2017 Johan Nylander. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
