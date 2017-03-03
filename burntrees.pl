@@ -11,12 +11,11 @@ use Data::Dumper;
 
 ## Globals
 my $scriptname         = $0;
-my $VERSION            = '0.3.0'; # Also in POD
-my $CHANGES            = '03/02/2017 03:03:15 PM';
+my $VERSION            = '0.3.0';
+my $CHANGES            = '03/03/2017 03:48:18 PM';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
-my $burnin             = q{}; # q{} is empty
+my $burnin             = q{};
 my $close              = q{};
-#my $concatenate       = q{};
 my $end                = q{};
 my $figtree            = q{};
 my $format             = q{};
@@ -61,7 +60,6 @@ MAIN:
         GetOptions('help'         => sub { pod2usage(1); },
                    'version'      => sub { print STDOUT "  $scriptname version $VERSION\n  Last changes $CHANGES\n"; exit(0) },
                    'man'          => sub { pod2usage(-exitstatus => 0, -verbose => 2); },
-                   #'concatenate'  => \$concatenate,
                    'burnin:i'     => \$burnin,
                    'close'        => \$close,
                    'DEBUG'        => \$DEBUG,
@@ -334,9 +332,6 @@ MAIN:
             if ($sci2norm) {
                 $_ = sci2norm($_,$sci2norm); # warning, this is done one the whole string, including tree name and newick string.
             }
-            #if ($rmbrlens) { # Should rmbrlens here once. No strip_brlens_print needed?
-            #    #$_ = ;
-            #}
             if ($myr) {
                 $_ = brlen2time($_);
             }
@@ -396,7 +391,6 @@ MAIN:
                 else {
                     print STDERR "\n=== print 2:(i:$i j:$j) ===" if $DEBUG;
                     if ($random_nr <  $ifeellucky) {
-                        #print Dumper($i) and getc();print Dumper($jump) and getc(); # DEBUG:
                         my $l = $DEBUG ? "$_ [DEBUG:bpa]\n" : "$_\n";
                         print $PRINT_FH $l if ( ($i % $jump) == 0 ); # Print with branch lengths if modulus is 0.
                         if ($close) {
@@ -430,18 +424,15 @@ MAIN:
                         if ($random_nr <  $ifeellucky) {
                             strip_brlens_print($_); # Make sure to print the start tree.
                         }
-                        $j = 1; # Set counter for --jump. # DEBUG: START HERE
-                        #$j = 0; # Set counter for --jump.
+                        $j = 1;
                     }
                     else {
                         print STDERR "\n=== print 4:(i:$i j:$j) ===" if $DEBUG;
                         if ($random_nr <  $ifeellucky) {
-                            #print Dumper($i) and getc();print Dumper($jump) and getc(); # DEBUG:
                             my $l = $DEBUG ? "$_ [DEBUG:fpa]\n" : "$_\n";
                             print $PRINT_FH $l;
                         }
-                        $j = 1; # DEBUG: START HERE
-                        #$j = 0;
+                        $j = 1;
                     }
                 }
                 elsif ($i > $start) {
@@ -454,7 +445,6 @@ MAIN:
                     else {
                         print STDERR "\n=== print 6:(i:$i j:$j) ===" if $DEBUG;
                         if ($random_nr <  $ifeellucky) {
-                            #print Dumper($i) and getc();print Dumper($jump) and getc(); # DEBUG:
                             my $l = $DEBUG ? "$_ [DEBUG:gpa]\n" : "$_\n";
                             print $PRINT_FH $l if ( ($j % $jump) == 0 );
                         }
@@ -462,7 +452,7 @@ MAIN:
                 }
             }
             $i++;
-            $j++; # DEBUG: When should this be incremented? Only after successful "jump-print"?
+            $j++;
         }
         else { # If string is not a tree, it's either taxa descriptions or a trailing end
             if ($i > $end) {
