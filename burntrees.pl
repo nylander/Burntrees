@@ -43,6 +43,7 @@ my $rmbrlens           = q{};
 my $rmcomments         = q{};
 my $rmsupport          = q{};
 my $sci2norm           = q{};
+my $seed               = q{};
 my $start              = q{};
 my $treesonly          = q{};
 my $altnexus_treesonly = q{};
@@ -80,6 +81,7 @@ MAIN:
                    'rmcomments'   => \$rmcomments,
                    'rmsupport'    => \$rmsupport,
                    'sci2norm:-1'  => \$sci2norm,
+                   'seed:i'       => \$seed,
                    'start:i'      => \$start,
                    'treesonly'    => \$treesonly,
                   );
@@ -170,6 +172,9 @@ MAIN:
     if ($ifeellucky eq '') {
         $ifeellucky = 1;
         $random_nr = 0;
+    }
+    elsif ($seed) {
+        srand $seed;
     }
 
     ## Set --end default to $ntrees if no --end
@@ -597,6 +602,7 @@ sub print_debug {
     print STDERR "rmcomments:$rmcomments.\n";
     print STDERR "rmsupport:$rmsupport.\n";
     print STDERR "sci2norm:$sci2norm.\n";
+    print STDERR "seed:$seed.\n";
     print STDERR "start:$start.\n";
     print STDERR "treesonly:$treesonly.\n";
     print STDERR "altnexus_treesonly:$altnexus_treesonly.\n";
@@ -997,7 +1003,7 @@ Documentation for burntrees.pl version 0.3.0
 
 =head1 SYNOPSIS
 
-burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
+burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>] [--seed=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
 
 =head1 DESCRIPTION
@@ -1078,6 +1084,7 @@ Prints help message and exits.
 =item B<-i, --IFeelLucky=>I<number>
 
 Specify a probability (value between 0 -- 1) for each tree to be printed. That is, print each tree with prob. I<number>.
+The B<-i> option can be combined with the option -B<seed> to create reproducible results.
 Note that B<--IFeelLucky> has precedence over B<--jump>.
 
 
@@ -1130,6 +1137,11 @@ Remove support values (bootstrap/posterior probabilities) from trees.
 =item B<-sc, --sci2norm=I<number>>
 
 Translate branch lengths from scientific to normal or fixed. Change the precision by specifying the (optimal) I<number>.
+
+
+=item B<-se, --seed=I<number>>
+
+Set a seed for the I<-i> option to create reproducible sampling results.
 
 
 =item B<-st, --start=>I<number>
