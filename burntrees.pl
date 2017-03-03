@@ -48,6 +48,7 @@ my $start              = q{};
 my $treesonly          = q{};
 my $altnexus_treesonly = q{};
 my $version            = q{};
+my $was_newick         = q{};
 my %translation_table  = ();
 my $PRINT_FH;
 
@@ -65,7 +66,7 @@ MAIN:
                    #'concatenate'  => \$concatenate,
                    'burnin:i'     => \$burnin,
                    'close'        => \$close,
-                   'DEBUG'        => \$DEBUG,
+                   'DEBUG+'       => \$DEBUG,
                    'end:i'        => \$end,
                    'format:s'     => \$format,
                    'getinfo'      => \$getinfo,
@@ -88,7 +89,7 @@ MAIN:
     }
 
     ## Some debug printing
-    print_debug(1) if $DEBUG;
+    print_debug(1) if ($DEBUG > 1);
 
     ## Set --jump default. 1 prints every tree.
     if ($jump eq '') {
@@ -137,6 +138,7 @@ MAIN:
         }
         elsif (/\)\s*;\s*$/) {                 # A phylobase tree file have newick trees on one line
             $is_tree_file = 1;
+            $was_newick = 1;
             $match = '^\s*\(';
             $ntrees++;
             next;
@@ -324,7 +326,7 @@ MAIN:
         if ($ifeellucky > 1);
 
     ## Some debug printing
-    print_debug(2) if $DEBUG;
+    print_debug(2) if ($DEBUG > 1);
 
     PRINT:
     ## Finally: do the printing
@@ -358,6 +360,9 @@ MAIN:
                 elsif ($format eq 'altnexus') {
                     if ($labels) {
                         $_ = replace_numbers($_, \%translation_table);
+                    }
+                    if ($was_newick) {
+                        $_ = "  tree rep.$i = " . $_;
                     }
                 }
                 elsif ($labels) {
@@ -484,7 +489,7 @@ MAIN:
     close ($INFILE) or warn "$0 : failed to close input file $infile : $!\n";
 
     ## Some debug printing
-    print_debug(3) if $DEBUG;
+    print_debug(3) if ($DEBUG > 1);
 
     ## Exit explicitly
     exit(0);
