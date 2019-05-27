@@ -218,7 +218,7 @@ USAGE
     have in your tree file (i.e., performing a bootstrap)!
 
       burntrees.pl -t data.t | shuf -rn 10
-      burntrees.pl -t -t p data.t | shuf -rn 1000
+      burntrees.pl -t -f p data.t | shuf -rn 1000
 
 AUTHOR
     Written by Johan A. A. Nylander
@@ -233,7 +233,7 @@ DOWNLOAD
     https://github.com/nylander/Burntrees
 
 LICENSE AND COPYRIGHT
-    Copyright (c) 2006-2017, Johan Nylander. All rights reserved.
+    Copyright (c) 2006-2019, Johan Nylander. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the

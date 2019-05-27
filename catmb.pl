@@ -208,7 +208,7 @@ https://github.com/nylander/Burntrees
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006--2017 Johan Nylander. All rights reserved.
+Copyright (c) 2006--2019 Johan Nylander. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

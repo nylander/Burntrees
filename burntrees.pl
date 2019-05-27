@@ -968,7 +968,7 @@ sub test_figtree_format {
 
 
 #===  POD DOCUMENTATION  =======================================================
-#      VERSION: 03/03/2017 01:44:23 PM
+#      VERSION: Mon 27 maj 2019 13:55:45
 #  DESCRIPTION: Documentation
 #         TODO: Add examples using rmsupport and about converting .con.tre files
 #===============================================================================
@@ -1227,7 +1227,7 @@ To change the MrBayes clock branch length format from substitutions per site to 
 To (randomly) sample a specific number of trees, use burntrees.pl together with 'shuf'. Note that you could sample more trees than you have in your tree file (i.e., performing a bootstrap)!
 
   burntrees.pl -t data.t | shuf -rn 10
-  burntrees.pl -t -t p data.t | shuf -rn 1000
+  burntrees.pl -t -f p data.t | shuf -rn 1000
 
 =head1 AUTHOR
 
@@ -1251,7 +1251,7 @@ https://github.com/nylander/Burntrees
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2006-2017, Johan Nylander.
+Copyright (c) 2006-2019, Johan Nylander.
 All rights reserved.
 
 This program is free software; you can redistribute it and/or
