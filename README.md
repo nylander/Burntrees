@@ -45,8 +45,8 @@ Documentation for burntrees.pl version 0.3.1
 
 ### DESCRIPTION
 
-Script for manipulating tree (*.t, *.trprobs, *.con, *.trees) and
-parameter (*.p, *.log) files from MrBayes (v.3), BEAST, and PhyloBayes.
+Script for manipulating tree (.t, .trprobs, .con, .trees) and
+parameter (.p, .log) files from MrBayes (v.3), BEAST, and PhyloBayes.
 
 The script extracts trees and (by default) the taxon translation table
 and the trailing "end;" from tree file.
@@ -317,7 +317,7 @@ Documentation for catmb.pl version 0.1.2
 
 ### DESCRIPTION
 
-Script for manipulating tree (*.t) and parameter (*.p) files from
+Script for manipulating tree (.t) and parameter (.p) files from
 MrBayes (v.3). This script is a helper for concatenating several files
 in to one (using the same burnin) using the script 'burntrees.pl'.
 burntrees.pl needs to be installed for catmb.pl to work.
