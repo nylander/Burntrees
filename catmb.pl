@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 ## Use 'perldoc catmb.pl' or see the end of file for description.
 
@@ -9,8 +9,8 @@ use Pod::Usage;
 
 ## Globals
 my $scriptname        = $0;
-my $VERSION           = '0.1.1';
-my $CHANGES           = '02/02/2007 01:55:01 AM CET';
+my $VERSION           = '0.1.2';
+my $CHANGES           = 'Mon 13 Apr 2020';
 my $DEBUG             = 0;                            # 1: Debug printing
 my $help              = q{};                          # q{} is empty
 my $version           = q{};
@@ -107,7 +107,7 @@ catmb.pl
 
 =head1 VERSION
 
-Documentation for catmb.pl version 0.1.1
+Documentation for catmb.pl version 0.1.2
 
 
 =head1 SYNOPSIS
@@ -144,7 +144,6 @@ Start printing after a fraction of the run, where I<number> is a percentage (e.g
 =item B<-j, --jump=>I<number>
 
 Specify a thinning. That is, print every I<number> tree.
-
 
 
 =item B<FILE>
@@ -192,7 +191,7 @@ Written by Johan A. A. Nylander
 
 =head1 REPORTING BUGS
 
-Please report any bugs to I<Johan.Nylander @ nbis.se>.
+Please report any bugs to I<Johan.Nylander @ nrm.se>.
 
 
 =head1 DEPENDENCIES

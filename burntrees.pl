@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 ## Use 'perldoc burntrees.pl' or see the end of file for description.
 
@@ -6,13 +6,12 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
-use Data::Dumper;
 
 
 ## Globals
 my $scriptname         = $0;
-my $VERSION            = '0.3.0';
-my $CHANGES            = '03/03/2017 03:48:18 PM';
+my $VERSION            = '0.3.1';
+my $CHANGES            = 'Mon 13 Apr 2020';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{};
 my $close              = q{};
@@ -42,10 +41,12 @@ my $rmbrlens           = q{};
 my $rmcomments         = q{};
 my $rmsupport          = q{};
 my $sci2norm           = q{};
+my $seed               = q{};
 my $start              = q{};
 my $treesonly          = q{};
 my $altnexus_treesonly = q{};
 my $version            = q{};
+my $was_newick         = q{};
 my %translation_table  = ();
 my $PRINT_FH;
 
@@ -62,7 +63,7 @@ MAIN:
                    'man'          => sub { pod2usage(-exitstatus => 0, -verbose => 2); },
                    'burnin:i'     => \$burnin,
                    'close'        => \$close,
-                   'DEBUG'        => \$DEBUG,
+                   'DEBUG+'       => \$DEBUG,
                    'end:i'        => \$end,
                    'format:s'     => \$format,
                    'getinfo'      => \$getinfo,
@@ -78,13 +79,14 @@ MAIN:
                    'rmcomments'   => \$rmcomments,
                    'rmsupport'    => \$rmsupport,
                    'sci2norm:-1'  => \$sci2norm,
+                   'seed:i'       => \$seed,
                    'start:i'      => \$start,
                    'treesonly'    => \$treesonly,
                   );
     }
 
     ## Some debug printing
-    print_debug(1) if $DEBUG;
+    print_debug(1) if ($DEBUG > 1);
 
     ## Set --jump default. 1 prints every tree.
     if ($jump eq '') {
@@ -133,6 +135,7 @@ MAIN:
         }
         elsif (/\)\s*;\s*$/) {                 # A phylobase tree file have newick trees on one line
             $is_tree_file = 1;
+            $was_newick = 1;
             $match = '^\s*\(';
             $ntrees++;
             next;
@@ -168,6 +171,9 @@ MAIN:
     if ($ifeellucky eq '') {
         $ifeellucky = 1;
         $random_nr = 0;
+    }
+    elsif ($seed) {
+        srand $seed;
     }
 
     ## Set --end default to $ntrees if no --end
@@ -317,7 +323,7 @@ MAIN:
         if ($ifeellucky > 1);
 
     ## Some debug printing
-    print_debug(2) if $DEBUG;
+    print_debug(2) if ($DEBUG > 1);
 
     PRINT:
     ## Finally: do the printing
@@ -348,6 +354,9 @@ MAIN:
                 elsif ($format eq 'altnexus') {
                     if ($labels) {
                         $_ = replace_numbers($_, \%translation_table);
+                    }
+                    if ($was_newick) {
+                        $_ = "  tree rep.$i = " . $_;
                     }
                 }
                 elsif ($labels) {
@@ -469,7 +478,7 @@ MAIN:
     close ($INFILE) or warn "$0 : failed to close input file $infile : $!\n";
 
     ## Some debug printing
-    print_debug(3) if $DEBUG;
+    print_debug(3) if ($DEBUG > 1);
 
     ## Exit explicitly
     exit(0);
@@ -587,6 +596,7 @@ sub print_debug {
     print STDERR "rmcomments:$rmcomments.\n";
     print STDERR "rmsupport:$rmsupport.\n";
     print STDERR "sci2norm:$sci2norm.\n";
+    print STDERR "seed:$seed.\n";
     print STDERR "start:$start.\n";
     print STDERR "treesonly:$treesonly.\n";
     print STDERR "altnexus_treesonly:$altnexus_treesonly.\n";
@@ -968,7 +978,7 @@ sub test_figtree_format {
 
 
 #===  POD DOCUMENTATION  =======================================================
-#      VERSION: Mon 27 maj 2019 13:55:45
+#      VERSION: Mon 27 maj 2019 14:02:44
 #  DESCRIPTION: Documentation
 #         TODO: Add examples using rmsupport and about converting .con.tre files
 #===============================================================================
@@ -982,12 +992,12 @@ burntrees.pl
 
 =head1 VERSION
 
-Documentation for burntrees.pl version 0.3.0
+Documentation for burntrees.pl version 0.3.1
 
 
 =head1 SYNOPSIS
 
-burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
+burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>] [--seed=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
 
 =head1 DESCRIPTION
@@ -1068,6 +1078,7 @@ Prints help message and exits.
 =item B<-i, --IFeelLucky=>I<number>
 
 Specify a probability (value between 0 -- 1) for each tree to be printed. That is, print each tree with prob. I<number>.
+The B<-i> option can be combined with the option -B<seed> to create reproducible results.
 Note that B<--IFeelLucky> has precedence over B<--jump>.
 
 
@@ -1120,6 +1131,11 @@ Remove support values (bootstrap/posterior probabilities) from trees.
 =item B<-sc, --sci2norm=I<number>>
 
 Translate branch lengths from scientific to normal or fixed. Change the precision by specifying the (optimal) I<number>.
+
+
+=item B<-se, --seed=I<number>>
+
+Set a seed for the I<-i> option to create reproducible sampling results.
 
 
 =item B<-st, --start=>I<number>
