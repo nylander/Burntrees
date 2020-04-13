@@ -814,7 +814,7 @@ sub sci2norm_print {
 
 #===  FUNCTION  ================================================================
 #         NAME: strip_brlens_print
-#      VERSION: 07/10/2014 04:08:11 PM
+#      VERSION: Mon 13 Apr 2020 12:59:44 PM CEST
 #  DESCRIPTION: Removes the branch lengths from a tree descriptions and print.
 #   PARAMETERS: tree string
 #      RETURNS: Void. Prints to $PRINT_FH
@@ -830,7 +830,7 @@ sub strip_brlens_print {
         $_ =~ s/:[\d\.]+//g; # Search for any pattern such as ":0.033372" and replace with nothing
     }
 
-    print $PRINT_FH "$_ [strip_brlens_print]\n";
+    print $PRINT_FH "$_\n";
 
 } # end of strip_brlens_print
 
