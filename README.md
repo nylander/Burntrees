@@ -39,7 +39,7 @@ Documentation for burntrees.pl version 0.3.1
 
     burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>]
     [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly]
-    [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>]
+    [--rmbrlens] [--rmcomments] [--rmsupport] [-R] [--sci2norm=<nr>]
     [--seed=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels]
     [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
@@ -150,6 +150,8 @@ Mandatory arguments to long options are mandatory for short options too
             Remove support values (bootstrap/posterior probabilities) from
             trees.
 
+    -R      Remove branch lengths, comments, and support values.
+
     -sc, --sci2norm=*number*
             Translate branch lengths from scientific to normal or fixed.
             Change the precision by specifying the (optimal) *number*.
@@ -242,6 +244,10 @@ scientific to normal (three decimals), use
 To remove branch lengths from tree descriptions, use
 
       burntrees.pl --rmbrlens data.t
+
+To remove branch lengths, support values, and comments from tree descriptions, use
+
+      burntrees.pl -R data.t
 
 To change the branch length format from scientific to numerical (three
 decimals) use

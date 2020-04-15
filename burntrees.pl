@@ -4,13 +4,14 @@
 
 use strict;
 use warnings;
-use Getopt::Long;
 use Pod::Usage;
+use Getopt::Long;
+Getopt::Long::Configure("no_ignore_case");
 
 
 ## Globals
 my $scriptname         = $0;
-my $VERSION            = '0.3.1';
+my $VERSION            = '0.3.2';
 my $CHANGES            = 'Mon 13 Apr 2020';
 my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
 my $burnin             = q{};
@@ -40,6 +41,7 @@ my $random_nr          = q{};
 my $rmbrlens           = q{};
 my $rmcomments         = q{};
 my $rmsupport          = q{};
+my $R                  = q{};
 my $sci2norm           = q{};
 my $seed               = q{};
 my $start              = q{};
@@ -58,31 +60,33 @@ MAIN:
         exit(0);
     }
     else {
-        GetOptions('help'         => sub { pod2usage(1); },
-                   'version'      => sub { print STDOUT "  $scriptname version $VERSION\n  Last changes $CHANGES\n"; exit(0) },
-                   'man'          => sub { pod2usage(-exitstatus => 0, -verbose => 2); },
-                   'burnin:i'     => \$burnin,
-                   'close'        => \$close,
-                   'DEBUG+'       => \$DEBUG,
-                   'end:i'        => \$end,
-                   'format:s'     => \$format,
-                   'getinfo'      => \$getinfo,
-                   'ifeellucky:f' => \$ifeellucky,
-                   'jump:i'       => \$jump,
-                   'labels'       => \$labels,
-                   'myr'          => \$myr,
-                   'noclose'      => \$noclose,
-                   'nolabels'     => \$nolabels,
-                   'outfile:s'    => \$outfile,
-                   'pburnin:i'    => \$pburnin,
-                   'rmbrlens'     => \$rmbrlens,
-                   'rmcomments'   => \$rmcomments,
-                   'rmsupport'    => \$rmsupport,
-                   'sci2norm:-1'  => \$sci2norm,
-                   'seed:i'       => \$seed,
-                   'start:i'      => \$start,
-                   'treesonly'    => \$treesonly,
-                  );
+        GetOptions(
+            'help'         => sub { pod2usage(1); },
+            'version'      => sub { print STDOUT "  $scriptname version $VERSION\n  Last changes $CHANGES\n"; exit(0) },
+            'man'          => sub { pod2usage(-exitstatus => 0, -verbose => 2); },
+            'burnin:i'     => \$burnin,
+            'close'        => \$close,
+            'DEBUG+'       => \$DEBUG,
+            'end:i'        => \$end,
+            'format:s'     => \$format,
+            'getinfo'      => \$getinfo,
+            'ifeellucky:f' => \$ifeellucky,
+            'jump:i'       => \$jump,
+            'labels'       => \$labels,
+            'myr'          => \$myr,
+            'noclose'      => \$noclose,
+            'nolabels'     => \$nolabels,
+            'outfile:s'    => \$outfile,
+            'pburnin:i'    => \$pburnin,
+            'rmbrlens'     => \$rmbrlens,
+            'rmcomments'   => \$rmcomments,
+            'rmsupport'    => \$rmsupport,
+            'R'            => \$R,
+            'sci2norm:-1'  => \$sci2norm,
+            'seed:i'       => \$seed,
+            'start:i'      => \$start,
+            'treesonly'    => \$treesonly,
+        );
     }
 
     ## Some debug printing
@@ -190,6 +194,7 @@ MAIN:
         }
     }
 
+    SUPPORT:
     ## Test if support values
     if ($rmsupport) {
         my $has_support = test_has_support($infile);
@@ -198,6 +203,16 @@ MAIN:
         }
     }
 
+    REMOVEALL:
+    ## Remove brlens, support, and comments. This needs to be checked after
+    ## BRLENS and SUPPORT (i.e, don't check, just try to remove)!
+    if ($R) {
+        $rmbrlens = 1;
+        $rmcomments = 1;
+        $rmsupport = 1;
+    }
+
+    MYR:
     ## Test clockrate if myr
     if ($myr) {
         my $has_clockrate = test_has_clockrate($infile);
@@ -281,7 +296,7 @@ MAIN:
             my $Ntrees = $end - $start + 1;
             print $PRINT_FH "Number of $word after burnin : $Ntrees\n";
         }
-        if (($lastgen) && ($lastgen > 1)) { # If no 'rep' in tree file, $lastgen was set to 1 (then probably not a Mrbayes *.t file)
+        if (($lastgen) && ($lastgen > 1)) { # If no 'rep' in tree file, $lastgen was set to 1 (then probably not a MrBayes .t file)
             print $PRINT_FH "Thinning seems to have been : $thinning\n";
             print $PRINT_FH "Number of generations was then : $totgen\n";
         }
@@ -558,7 +573,7 @@ sub brlen2time_print {
 
 #===  FUNCTION  ================================================================
 #         NAME: print_debug
-#      VERSION: 08/22/2016 02:01:53 PM
+#      VERSION: ons 15 apr 2020 17:00:09
 #  DESCRIPTION: debug printing
 #   PARAMETERS: number
 #      RETURNS: prints to STDERR
@@ -595,6 +610,7 @@ sub print_debug {
     print STDERR "rmbrlens:$rmbrlens.\n";
     print STDERR "rmcomments:$rmcomments.\n";
     print STDERR "rmsupport:$rmsupport.\n";
+    print STDERR "R:$R.\n";
     print STDERR "sci2norm:$sci2norm.\n";
     print STDERR "seed:$seed.\n";
     print STDERR "start:$start.\n";
@@ -877,7 +893,7 @@ sub test_has_brlens {
 
 #===  FUNCTION  ================================================================
 #         NAME: test_has_clockrate
-#      VERSION: 04/09/2013 01:37:48 PM
+#      VERSION: ons 15 apr 2020 17:10:43
 #  DESCRIPTION: Tests for presence of clockrate in the tree description.
 #               Warning: no error checking. Assumes MrBayes clock tree format.
 #               tree gen.5000000[&B Igrbranchlens{all}] = [&R] [&clockrate=8.332129945298162e-04] (1:4.907...
@@ -893,7 +909,7 @@ sub test_has_clockrate {
     while(<$FILE>) {
         chomp;
         if(/^\s*tree/i) {
-            if ( $_ =~ /&clockrate/ ) {
+            if ( $_ =~ /&clockrate/i ) {
                 $clr = 1;
             }
             last;
@@ -978,7 +994,7 @@ sub test_figtree_format {
 
 
 #===  POD DOCUMENTATION  =======================================================
-#      VERSION: Mon 27 maj 2019 14:02:44
+#      VERSION: ons 15 apr 2020 17:02:07
 #  DESCRIPTION: Documentation
 #         TODO: Add examples using rmsupport and about converting .con.tre files
 #===============================================================================
@@ -992,12 +1008,12 @@ burntrees.pl
 
 =head1 VERSION
 
-Documentation for burntrees.pl version 0.3.1
+Documentation for burntrees.pl version 0.3.2
 
 
 =head1 SYNOPSIS
 
-burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [--sci2norm=<nr>] [--seed=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
+burntrees.pl [--burnin=<number>] [--pburnin=<number>] [--start=<number>] [--end=<number>] [--jump=<number>] [--IFeelLucky=<number>] [--treesonly] [--rmbrlens] [--rmcomments] [--rmsupport] [-R] [--sci2norm=<nr>] [--seed=<nr>] [--myr] [--[no]close] [--getinfo] [--[no]labels] [--format=altnexus|phylip] [--outfile=<file_name>] FILE [> OUTPUT]
 
 
 =head1 DESCRIPTION
@@ -1128,6 +1144,11 @@ Remove comments (text within, and the enclosing square brackets) from trees.
 Remove support values (bootstrap/posterior probabilities) from trees.
 
 
+=item B<-R>
+
+Remove branch lengths, support values, and comments from trees.
+
+
 =item B<-sc, --sci2norm=I<number>>
 
 Translate branch lengths from scientific to normal or fixed. Change the precision by specifying the (optimal) I<number>.
@@ -1231,6 +1252,10 @@ To remove branch lengths from tree descriptions, use
 
   burntrees.pl --rmbrlens data.t
 
+To remove branch lengths, support values, and comments from tree descriptions, use
+
+  burntrees.pl -R data.t
+
 To change the branch length format from scientific to numerical (three decimals) use
 
   burntrees.pl --sci2norm=3 data.con.tre
@@ -1252,7 +1277,7 @@ Written by Johan A. A. Nylander
 
 =head1 REPORTING BUGS
 
-Please report any bugs to I<Johan.Nylander @ nbis.se>.
+Please report any bugs to I<Johan.Nylander @ nrm.se>.
 
 
 =head1 DEPENDENCIES
