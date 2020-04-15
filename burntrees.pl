@@ -11,9 +11,9 @@ Getopt::Long::Configure("no_ignore_case");
 
 ## Globals
 my $scriptname         = $0;
-my $VERSION            = '0.3.2';
-my $CHANGES            = 'Mon 13 Apr 2020';
-my $DEBUG              = 0;   # Set to 1 or use --DEBUG for debug printing
+my $VERSION            = '0.3.3';
+my $CHANGES            = '15 Apr 2020';
+my $DEBUG              = 0;
 my $burnin             = q{};
 my $close              = q{};
 my $end                = q{};
@@ -270,6 +270,17 @@ MAIN:
         }
         else { # Warn if --format is used with a *.p file
             die "\nWarning! argument 'format' is only applicable on tree files.\n\n"
+        }
+    }
+    elsif ($was_newick) {
+        $format = 'phylip';
+        $treesonly = 1;
+        $close = 0;
+        if ($nolabels) {
+            $labels = 0;
+        }
+        else {
+            $labels = 1;
         }
     }
 
@@ -1008,7 +1019,7 @@ burntrees.pl
 
 =head1 VERSION
 
-Documentation for burntrees.pl version 0.3.2
+Documentation for burntrees.pl version 0.3.3
 
 
 =head1 SYNOPSIS
